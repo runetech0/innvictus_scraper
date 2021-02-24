@@ -1,0 +1,7 @@
+*.zip
+config.json
+proxies.json
+.vscode
+tests*
+__pyca*
+db
