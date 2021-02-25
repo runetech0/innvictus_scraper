@@ -32,6 +32,8 @@ def get_user_agent():
 def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None):
     PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS = get_proxy()
     user_agent = get_user_agent()
+    config = json.load(open('config.json'))
+    CHROME_LOCATION = config.get("CHROME_LOCATION")
 
     manifest_json = """
     {
@@ -90,6 +92,8 @@ def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None)
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument('--start-maximized')
+    chrome_options.binary_location = CHROME_LOCATION
+
     # chrome_options.add_argument('--headless')
     if use_proxy:
         pluginfile = 'proxy_auth_plugin.zip'

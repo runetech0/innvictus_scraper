@@ -1,6 +1,7 @@
 {
     "BOT_TOKEN": "NzEyMjE1Nzk4OTY1NjAwMzc3.XsOUpg.",
     "WEBDRIVER_PATH": "/home/virchual/webdrivers/chromedriver",
+    "CHROME_LOCATION": "",
     "COMMAND_PREFIX": ".",
     "OUTPUT_CHANNEL_ID": 813055093334736986
 }
