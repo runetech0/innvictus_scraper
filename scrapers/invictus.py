@@ -134,15 +134,18 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
     async def main(self):
         print('[+] Restock monitor is ready!')
         while True:
-            restock_list = self.db.get_inn_rs_list()
+            restock_list = await self.db.get_inn_rs_list()
             for link in restock_list:
                 if await self.prod_in_stock(link):
                     prod = await self.get_prod_details(link)
                     self.queue.put(prod)
+                    await asyncio.sleep(1)
 
     async def prod_in_stock(self, link):
+        await self.load_prod_page(link)
         in_stock = self.driver.find_element_by_id(
             'js-stock-notification-container').text
+        self.driver.quit()
         if in_stock == '':
             return False
         return True
