@@ -89,6 +89,7 @@ def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None)
     chrome_options.add_argument(f'user-agent={user_agent}')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--start-maximized')
     # chrome_options.add_argument('--headless')
     if use_proxy:
         pluginfile = 'proxy_auth_plugin.zip'
