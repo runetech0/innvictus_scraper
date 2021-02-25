@@ -2,7 +2,7 @@ from discord.ext import commands
 import json
 import threading
 import queue
-from scrapers.invictus import InvictusNewProductsScraper
+from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from extensions.sender import Sender
 
 config = json.load(open('config.json', 'r'))
@@ -29,6 +29,10 @@ async def on_ready():
     # Thread to scrape invictus new products and send to the sender thread
     invictus = InvictusNewProductsScraper(products_queue)
     threading.Thread(target=invictus.start).start()
+
+    # Invictus Product Restock Monoitor
+    mon = InvictusRestockMonitor(products_queue)
+    threading.Thread(target=mon.start).start()
 
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)

@@ -132,6 +132,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         self.loop.run_until_complete(self.main())
 
     async def main(self):
+        print('[+] Restock monitor is ready!')
         while True:
             restock_list = self.db.get_inn_rs_list()
             for link in restock_list:
