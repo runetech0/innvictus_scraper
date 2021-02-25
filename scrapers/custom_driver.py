@@ -103,7 +103,7 @@ def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None)
             zp.writestr("background.js", background_js)
         chrome_options.add_extension(pluginfile)
     driver = webdriver.Chrome(executable_path=executable_path,
-                              chrome_options=chrome_options)
+                              options=chrome_options)
     return driver
 
 
