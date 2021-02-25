@@ -33,10 +33,6 @@ def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None)
     PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS = get_proxy()
     user_agent = get_user_agent()
 
-    if chrome_options is None:
-        chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument(f'user-agent={user_agent}')
-
     manifest_json = """
     {
         "version": "1.0.0",
@@ -90,6 +86,8 @@ def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None)
     """ % (PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS)
     # path = os.path.dirname(os.path.abspath(__file__))
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument(f'user-agent={user_agent}')
+    # chrome_options.add_argument('--headless')
     if use_proxy:
         pluginfile = 'proxy_auth_plugin.zip'
 

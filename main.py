@@ -16,7 +16,11 @@ BOT_TOKEN = config.get("BOT_TOKEN")
 @bot.event
 async def on_ready():
     print('[+] We have logged in as {0.user}'.format(bot))
-    print('[+] Starting scrapers ...')
+    print('[+] Loading extensions ...')
+    extensions = ['innvictus_commands']
+    for ext in extensions:
+        bot.load_extension(f'Cogs.{ext}')
+
     # All the threads are connected through queues
 
     # Products queue

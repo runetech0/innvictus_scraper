@@ -37,9 +37,17 @@ class Sender:
     async def handle_invictus_prod(self, prod:  InvictusProduct):
         embed = discord.Embed()
         embed.title = prod.prod_name
-        embed.add_field(name='Product Link', value=prod.prod_link)
-        embed.add_field(name='Price', value=prod.prod_price)
-        embed.add_field(name='Product Type', value=prod.prod_gender)
+        print(prod.prod_name)
+        embed.add_field(
+            name='Price', value=f'${prod.prod_price}', inline=False)
         embed.set_image(url=prod.prod_img_link)
+        embed.url = prod.prod_link
+        desc = '**Available Sizes**'
+        for size in prod.in_stock_sizes:
+            desc = f'{desc}\n{size}'
+        desc = f'{desc}\n**Un Available Sizes**'
+        for size in prod.out_of_stock_sizes:
+            desc = f'{desc}\n{size}'
+        embed.description = desc
         if self.innvictus_channel is not None:
             await self.innvictus_channel.send(embed=embed)
