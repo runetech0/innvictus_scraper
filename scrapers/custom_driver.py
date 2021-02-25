@@ -87,6 +87,7 @@ def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None)
     # path = os.path.dirname(os.path.abspath(__file__))
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument(f'user-agent={user_agent}')
+    chrome_options.add_argument('--no-sandbox')
     # chrome_options.add_argument('--headless')
     if use_proxy:
         pluginfile = 'proxy_auth_plugin.zip'
