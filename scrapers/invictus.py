@@ -37,7 +37,7 @@ class InvictusNewProductsScraper:
 
     async def main(self):
         print('[+] Invictus monitor started!')
-        # await self.create_cache()
+        await self.create_cache()
         while True:
             all_prods = await self.get_all_prod_links()
             print(f'[+] Got {len(all_prods)} products')
