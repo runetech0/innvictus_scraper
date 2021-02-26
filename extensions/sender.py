@@ -37,7 +37,6 @@ class Sender:
     async def handle_invictus_prod(self, prod:  InvictusProduct):
         embed = discord.Embed()
         embed.title = prod.prod_name
-        print(prod.prod_name)
         embed.add_field(
             name='Price', value=f'${prod.prod_price}', inline=False)
         embed.set_image(url=prod.prod_img_link)

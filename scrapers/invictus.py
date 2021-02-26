@@ -32,6 +32,8 @@ class InvictusNewProductsScraper:
 
     def start(self):
         self.loop.run_until_complete(self.main())
+        # test_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
+        # self.loop.run_until_complete(self.get_prod_details(test_link))
 
     async def main(self):
         print('[+] Invictus monitor started!')
@@ -95,9 +97,18 @@ class InvictusNewProductsScraper:
         self.driver.get(link)
 
     async def get_prod_details(self, link):
+        # print(f'Getting the product details {link}')
         await self.load_prod_page(link)
+        try:
+            WebDriverWait(self.driver, 60).until(
+                EC.presence_of_element_located(
+                    (By.ID, 'productName'))
+            )
+        except Exception as e:
+            print(e)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         prod = InvictusProduct()
-        prod.prod_name = self.driver.find_element_by_id('productName').text
+        prod.prod_name = soup.select('#productName')[0].text
         prod.prod_link = link
         img_slider = self.driver.find_element_by_class_name('slider-main')
         prod.prod_img_link = img_slider.find_element_by_tag_name(
@@ -110,11 +121,11 @@ class InvictusNewProductsScraper:
         bs = BeautifulSoup(price_html, 'html.parser')
         prod.prod_price = bs.select('#pdpCurrent_wholePart')[
             0].text.replace(',', '').replace('.', '')
-        sizes = size_list.find_elements_by_tag_name('li')
+        sizes = size_list.find_elements_by_tag_name('a')
         for size in sizes:
             size_number = size.text
             classes = size.get_attribute('class')
-            oos_class_name = 'product-size__option--no-stock"'
+            oos_class_name = 'product-size__option--no-stock'
             if oos_class_name in classes:
                 prod.out_of_stock_sizes.append(size_number)
                 continue
@@ -125,11 +136,14 @@ class InvictusNewProductsScraper:
 
 class InvictusRestockMonitor(InvictusNewProductsScraper):
     def __init__(self, queue):
-        InvictusNewProductsScraper.__init__(self, queue)
+        super().__init__(queue)
         self.db = DB()
 
     def start(self):
-        self.loop.run_until_complete(self.main())
+        # self.loop.run_until_complete(self.main())
+        # na_product_link = 'https://www.innvictus.com/mujeres/casual/tenis/nike/tenis-nike-dunk-low-coast/p/000000000000186482'
+        available_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
+        self.loop.run_until_complete(self.get_prod_details(available_link))
 
     async def main(self):
         print('[+] Restock monitor is ready!')
@@ -144,12 +158,15 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
         in_stock = self.driver.find_element_by_id(
-            'js-stock-notification-container').text
+            'js-stock-notification-container')
+        classes = in_stock.get_attribute('class')
         self.driver.quit()
-        if in_stock == '':
+        if 'hidden' in classes:
+            return True
+        else:
             return False
-        return True
 
 
 if __name__ == '__main__':
-    InvictusRestockMonitor(Queue())
+    mon = InvictusNewProductsScraper(Queue())
+    mon.start()
