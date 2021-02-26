@@ -10,11 +10,12 @@ from pyvirtualdisplay import Display
 from extensions.db import DB
 from bs4 import BeautifulSoup
 from queue import Queue
+import configs.global_vars as global_vars
 
 
 class InvictusNewProductsScraper:
     def __init__(self, queue):
-        self.config = json.load(open('config.json', 'r'))
+        self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
         display = Display(visible=0, size=(1920, 1080))
         display.start()
@@ -153,6 +154,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
                 if await self.prod_in_stock(link):
                     prod = await self.get_prod_details(link)
                     self.queue.put(prod)
+                    await self.db.remove_inn_rs_list(link)
                     await asyncio.sleep(1)
 
     async def prod_in_stock(self, link):

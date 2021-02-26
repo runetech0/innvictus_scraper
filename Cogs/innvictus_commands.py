@@ -24,6 +24,15 @@ class InnvictusCommands(commands.Cog):
         await self.db.remove_inn_rs_list(link)
         await ctx.send('Link removed from restock monitor!')
 
+    @commands.command(name='list_innvictus_rs_links')
+    async def list_innvictus_rs_link(self, ctx):
+        rs_list = await self.db.get_inn_rs_list()
+        message = '**Links List**'
+        for link in rs_list:
+            message = f'{message}\n{link}'
+
+        await ctx.send(message)
+
 
 def setup(bot):
     bot.add_cog(InnvictusCommands(bot))

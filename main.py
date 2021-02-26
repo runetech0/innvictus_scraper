@@ -4,8 +4,9 @@ import threading
 import queue
 from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from extensions.sender import Sender
+import configs.global_vars as global_vars
 
-config = json.load(open('config.json', 'r'))
+config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
 
 prefix = config.get('COMMAND_PREFIX')
 bot = commands.Bot(command_prefix=prefix)

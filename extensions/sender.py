@@ -3,12 +3,13 @@ import asyncio
 from models.products import InvictusProduct
 import json
 import discord
+import configs.global_vars as global_vars
 
 
 class Sender:
     def __init__(self, bot, queue: queue.Queue):
         self.bot = bot
-        self.config = json.load(open('config.json', 'r'))
+        self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.innvictus_channel_id = self.config.get("OUTPUT_CHANNEL_ID")
         self.queue = queue
         self.loop = self.bot.loop

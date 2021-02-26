@@ -4,11 +4,11 @@ import time
 import json
 from random import randrange
 from selenium import webdriver
+import configs.global_vars as global_vars
 
 
 def get_proxy():
-    proxies_file = 'proxies.json'
-    with open(proxies_file) as f:
+    with open(global_vars.PROXIES_FILE_LOCATION) as f:
         config = json.load(f)
     proxies = config.get("PROXIES")
     index = randrange(len(proxies))
@@ -21,8 +21,7 @@ def get_proxy():
 
 
 def get_user_agent():
-    agents_file = 'user_agents.json'
-    with open(agents_file) as f:
+    with open(global_vars.USER_AGENTS_FILE_LOCATION) as f:
         config = json.load(f)
     agents = config.get("USER_AGENTS")
     rand_index = randrange(len(agents))
@@ -32,8 +31,8 @@ def get_user_agent():
 def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None):
     PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS = get_proxy()
     user_agent = get_user_agent()
-    config = json.load(open('config.json'))
-    CHROME_LOCATION = config.get("CHROME_LOCATION")
+    config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
+    # CHROME_LOCATION = config.get("CHROME_LOCATION")
 
     manifest_json = """
     {
