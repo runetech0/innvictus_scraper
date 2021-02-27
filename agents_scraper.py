@@ -1,6 +1,7 @@
 from selenium import webdriver
 import asyncio
 import json
+import logging
 
 
 class AgentsScraper:
@@ -12,6 +13,8 @@ class AgentsScraper:
         self.driver = webdriver.Chrome(
             executable_path=webdriver_path, options=options)
         self.loop = asyncio.new_event_loop()
+        self.log = logging.getLogger(' Agents Scraper ').info
+        ielf.log = logging.getLogger(' Agents Scraper ').info
         self.target_link = 'https://developers.whatismybrowser.com/useragents/explore/operating_system_name/mac-os-x/'
         'https://developers.whatismybrowser.com/useragents/explore/operating_system_name/windows/'
         'https://developers.whatismybrowser.com/useragents/explore/operating_system_name/linux/'
@@ -24,7 +27,7 @@ class AgentsScraper:
         config = {}
         for i in range(11):
             url = f'{self.target_link}{i+1}'
-            print(f'Target Link : {url}')
+            self.log(f'Target Link : {url}')
             agents = await self.get_all_agents(url)
             all_agents.extend(agents)
             await asyncio.sleep(10)
@@ -32,7 +35,7 @@ class AgentsScraper:
         config['PROXIES'] = all_agents
         with open('mac_agents.json', 'w') as f:
             json.dump(config, f, indent=4)
-        print("Done!")
+        self.log("Done!")
 
     async def get_all_agents(self, url):
         self.driver.get(url)

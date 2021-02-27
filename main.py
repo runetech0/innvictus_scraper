@@ -5,6 +5,24 @@ import queue
 from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from extensions.sender import Sender
 import configs.global_vars as global_vars
+import logging
+import os
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+consoleHandler = logging.StreamHandler()
+consoleHandler.setLevel(logging.INFO)
+formator = logging.Formatter(
+    '[%(asctime)s] - [%(name)s] - %(levelname)s - %(message)s')
+consoleHandler.setFormatter(formator)
+if not os.path.exists('./logs'):
+    os.mkdir('logs')
+fileHandler = logging.FileHandler('logs/app.log')
+fileHandler.setLevel(logging.DEBUG)
+fileHandler.setFormatter(formator)
+logger.addHandler(fileHandler)
+logger.addHandler(consoleHandler)
 
 config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
 

@@ -4,6 +4,7 @@ from models.products import InvictusProduct
 import json
 import discord
 import configs.global_vars as global_vars
+import logging
 
 
 class Sender:
@@ -13,6 +14,7 @@ class Sender:
         self.innvictus_channel_id = self.config.get("OUTPUT_CHANNEL_ID")
         self.queue = queue
         self.loop = self.bot.loop
+        self.log = logging.getLogger(' Sender ').info
 
     def start(self):
         self.loop.create_task(self.main())
@@ -21,13 +23,13 @@ class Sender:
         self.innvictus_channel = discord.utils.get(
             self.bot.guilds[0].channels, id=self.innvictus_channel_id)
         if self.innvictus_channel is None:
-            print('[-] Could Not find Innvictus Channel.')
+            self.log('[-] Could Not find Innvictus Channel.')
             return
-        print('[+] Innvictus Channel found!')
+        self.log('[+] Innvictus Channel found!')
 
     async def main(self):
         await self.read_up()
-        print('[+] Sender is ready!')
+        self.log('[+] Sender is ready!')
         while True:
             while self.queue.empty():
                 await asyncio.sleep(1)

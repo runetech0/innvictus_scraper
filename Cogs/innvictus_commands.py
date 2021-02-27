@@ -1,11 +1,13 @@
 from discord.ext import commands
 from extensions.db import DB
+import logging
 
 
 class InnvictusCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = DB()
+        self.log = logging.getLogger(' Innvictus Commands ').info
 
     @commands.command(name='add_innvictus_rs_link')
     async def add_to_innvitcus_restock_list(self, ctx, *, link):

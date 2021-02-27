@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 
+import logging
+
 
 class DB:
     def __init__(self):
@@ -7,6 +9,7 @@ class DB:
         self.db = self.client.scraper_db
         self.innvictus_data = self.db.innvictus_data
         self.innvictus_data_title = 'Innvictus'
+        self.log = logging.getLogger(' Database ').info
 
     async def link_in_inn_rsl(self, link):
         doc = self.innvictus_data.find_one(
