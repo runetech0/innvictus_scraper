@@ -4,4 +4,6 @@ proxies.json
 .vscode
 tests*
 __pyca*
+logs/*
+Cache/*
 db

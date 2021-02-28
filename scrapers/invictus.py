@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from queue import Queue
 import configs.global_vars as global_vars
 import logging
+from models.cache import ListCache
 
 
 class InvictusNewProductsScraper:
@@ -24,7 +25,7 @@ class InvictusNewProductsScraper:
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
         self.log = logging.getLogger(' Innvicuts Scraper ').info
-        self.cache = []
+        self.cache = ListCache('InvictusScraper')
         self.itter_time = 300
         self.target_links = [
             'https://www.innvictus.com/mujeres/c/mujeres',
@@ -48,22 +49,22 @@ class InvictusNewProductsScraper:
                 await asyncio.sleep(3)
                 continue
             for link in all_prods:
-                if link not in self.cache:
+                if not self.cache.in_cache(link):
                     prod = await self.get_prod_details(link)
                     self.queue.put(prod)
+                    self.cache.add_cache(link)
             await asyncio.sleep(self.itter_time)
 
     async def create_cache(self):
         self.log('[+] Creating cache for the products ..')
         all_prods = await self.get_all_prod_links()
-        for link in all_prods:
-            self.cache.append(link)
+        self.cache.replace_cache(all_prods)
         self.log('[+] Created cache for the products!')
 
-    async def get_all_prod_links(self):
+    async def get_all_prod_links(self) -> list:
         to_return = []
         for link in self.target_links:
-            self.log(f'[+] Getting products from {link}')
+            # self.log(f'[+] Getting products from {link}')
             tries = 0
             while True:
                 self.driver = get_chromedriver(
@@ -80,8 +81,6 @@ class InvictusNewProductsScraper:
                     tries += 1
                     if tries >= 5:
                         raise e
-                    self.log(
-                        'Got exception in > invictus_scraper > get_all_prods > waiting for prods')
                     self.log(
                         f'[-] Could not load page in try {tries} : {link}')
                     self.log(e)
@@ -110,6 +109,8 @@ class InvictusNewProductsScraper:
             )
         except Exception as e:
             self.log(e)
+            self.driver.quit()
+            return await self.get_prod_details(link)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         prod = InvictusProduct()
         prod.prod_name = soup.select('#productName')[0].text
@@ -143,12 +144,13 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         super().__init__(queue)
         self.db = DB()
         self.log = logging.getLogger(' Invictus Restock Monitor ').info
+        self.cache = ListCache('InvictusRestockMonList')
 
     def start(self):
-        # self.loop.run_until_complete(self.main())
+        self.loop.run_until_complete(self.main())
         # na_product_link = 'https://www.innvictus.com/mujeres/casual/tenis/nike/tenis-nike-dunk-low-coast/p/000000000000186482'
-        available_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
-        self.loop.run_until_complete(self.get_prod_details(available_link))
+        # available_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
+        # self.loop.run_until_complete(self.get_prod_details(available_link))
 
     async def main(self):
         self.log('[+] Restock monitor is ready!')

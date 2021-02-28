@@ -15,8 +15,8 @@ def get_proxy():
     proxy = proxies[index]
     ip = proxy.split(':')[0]
     port = int(proxy.split(':')[1])
-    username = config.get("USERNAME")
-    password = config.get("PASSWORD")
+    username = proxy.split(':')[2]
+    password = proxy.split(':')[3]
     return ip, port, username, password
 
 
@@ -115,4 +115,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    print(get_proxy())

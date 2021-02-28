@@ -1,7 +1,8 @@
 {
-    "BOT_TOKEN": "NzEyMjE1Nzk4OTY1NjAwMzc3.XsOUpg.",
+    "BOT_TOKEN": "NzEyMjE1Nzk4OTY1NjAwMzc3.XsOUpg.zZd7leLXzjQmpj9VTQARprYAM5E",
     "WEBDRIVER_PATH": "/home/virchual/webdrivers/chromedriver",
-    "CHROME_LOCATION": "",
+    "CHROME_LOCATION": "/usr/bin/chromium",
     "COMMAND_PREFIX": ".",
-    "OUTPUT_CHANNEL_ID": 813055093334736986
+    "INNVICTUS_CHANNEL_ID": 813055093334736986,
+    "TAF_CHANNEL_ID": 12
 }

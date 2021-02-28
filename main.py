@@ -3,6 +3,7 @@ import json
 import threading
 import queue
 from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
+from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
 from extensions.sender import Sender
 import configs.global_vars as global_vars
 import logging
@@ -52,6 +53,15 @@ async def on_ready():
     # Invictus Product Restock Monoitor
     mon = InvictusRestockMonitor(products_queue)
     threading.Thread(target=mon.start).start()
+
+    # Start the taf threads
+    mon = TafNewProdsScraper(products_queue)
+    threading.Thread(target=mon.start).start()
+
+    keywords = ['Dunk']
+    for keyword in keywords:
+        mon = TafKeywordMonitor(products_queue, keyword)
+        threading.Thread(target=mon.start).start()
 
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)

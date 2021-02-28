@@ -15,6 +15,24 @@ class InvictusProduct:
         self.in_stock_sizes: list = []
 
 
+class TafProduct:
+    def __init__(self):
+        self.title = None
+        self.link = None
+        self.img_link = None
+        self.price = None
+        self.model = None
+        self.in_stock_sizes: list(TafSize) = []
+        self.out_of_stock_sizes: list(TafSize) = []
+        self.sku = None
+
+
+class TafSize:
+    def __init__(self):
+        self.size_number = None
+        self.size_atc = None
+
+
 class ProductStatus(enum.Enum):
     OUT_OF_STOCK = 'Out of Stock'
     IN_STOCK = 'In Stock'
