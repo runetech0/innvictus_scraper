@@ -8,6 +8,7 @@ from extensions.sender import Sender
 import configs.global_vars as global_vars
 import logging
 import os
+import time
 
 
 logger = logging.getLogger()
@@ -49,19 +50,23 @@ async def on_ready():
     # Thread to scrape invictus new products and send to the sender thread
     invictus = InvictusNewProductsScraper(products_queue)
     threading.Thread(target=invictus.start).start()
+    time.sleep(3)
 
     # Invictus Product Restock Monoitor
     mon = InvictusRestockMonitor(products_queue)
     threading.Thread(target=mon.start).start()
+    time.sleep(3)
 
     # Start the taf threads
     mon = TafNewProdsScraper(products_queue)
     threading.Thread(target=mon.start).start()
+    time.sleep(3)
 
     keywords = ['Dunk']
     for keyword in keywords:
         mon = TafKeywordMonitor(products_queue, keyword)
         threading.Thread(target=mon.start).start()
+        time.sleep(3)
 
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)
