@@ -10,10 +10,9 @@ from bs4 import BeautifulSoup
 from models.products import TafProduct, TafSize
 from configs import global_vars
 from models.cache import ListCache
-import multiprocessing as mp
 
 
-class TafNewProdsScraper(mp.Process):
+class TafNewProdsScraper:
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
