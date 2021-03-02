@@ -31,6 +31,9 @@ class InnvictusCommands(commands.Cog):
         rs_list = await self.db.get_inn_rs_list()
         message = '**Links List**'
         for link in rs_list:
+            if len(message) + len(link) > 1900:
+                await ctx.send(message)
+                message = ''
             message = f'{message}\n{link}'
 
         await ctx.send(message)

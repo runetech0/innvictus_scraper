@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.common import exceptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import asyncio
@@ -165,8 +166,11 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
-        in_stock = self.driver.find_element_by_id(
-            'js-stock-notification-container')
+        try:
+            in_stock = self.driver.find_element_by_id(
+                'js-stock-notification-container')
+        except exceptions.NoSuchElementException:
+            return False
         classes = in_stock.get_attribute('class')
         self.driver.quit()
         if 'hidden' in classes:
