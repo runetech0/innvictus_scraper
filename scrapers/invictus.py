@@ -21,8 +21,6 @@ class InvictusNewProductsScraper(multiprocessing.Process):
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
-        display = Display(visible=0, size=(1920, 1080))
-        display.start()
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
@@ -37,6 +35,8 @@ class InvictusNewProductsScraper(multiprocessing.Process):
         ]
 
     def start(self):
+        display = Display(visible=0, size=(1920, 1080))
+        display.start()
         self.loop.run_until_complete(self.main())
         # test_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
         # self.loop.run_until_complete(self.get_prod_details(test_link))
