@@ -1,6 +1,7 @@
 from discord.ext import commands
 import json
 import threading
+import multiprocessing
 import queue
 from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
@@ -54,17 +55,17 @@ async def on_ready():
 
     # Thread to scrape invictus new products and send to the sender thread
     invictus = InvictusNewProductsScraper(products_queue)
-    threading.Thread(target=invictus.start).start()
+    multiprocessing.Process(target=invictus.start).start()
     time.sleep(3)
 
     # Invictus Product Restock Monoitor
     mon = InvictusRestockMonitor(products_queue)
-    threading.Thread(target=mon.start).start()
+    multiprocessing.Process(target=mon.start).start()
     time.sleep(3)
 
     # Start the taf threads
     mon = TafNewProdsScraper(products_queue)
-    threading.Thread(target=mon.start).start()
+    multiprocessing.Process(target=mon.start).start()
     time.sleep(3)
 
     keywords = ['Dunk']
@@ -75,7 +76,7 @@ async def on_ready():
 
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)
-    threading.Thread(target=sender.start).start()
+    multiprocessing.Process(target=sender.start).start()
 
 
 bot.run(BOT_TOKEN)
