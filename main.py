@@ -8,6 +8,7 @@ from extensions.sender import Sender
 import configs.global_vars as global_vars
 import logging
 import os
+import discord
 import time
 
 
@@ -38,6 +39,10 @@ BOT_TOKEN = config.get("BOT_TOKEN")
 async def on_ready():
     print('[+] We have logged in as {0.user}'.format(bot))
     print('[+] Loading extensions ...')
+    channel_id = config.get("INNVICTUS_CHANNEL_ID")
+    innvictus_channel = discord.utils.get(
+        bot.guilds[0].channels, id=channel_id)
+    await innvictus_channel.send('Now online!')
     extensions = ['innvictus_commands']
     for ext in extensions:
         bot.load_extension(f'Cogs.{ext}')
