@@ -18,8 +18,8 @@ class TafNewProdsScraper:
         self.queue = queue
         self.cache = ListCache('TafNewScraper')
         self.options = webdriver.ChromeOptions()
-        self.options.add_argument('--headless')
         self.options.add_argument('--no-sandbox')
+        self.options.add_argument('--headless')
         self.options.add_argument('--disable-dev-shm-usage')
         self.options.add_argument('start-maximized')
         self.options.add_argument('disable-infobars')
