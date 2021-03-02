@@ -17,7 +17,7 @@ from models.cache import ListCache
 import multiprocessing
 
 
-class InvictusNewProductsScraper(multiprocessing.Process):
+class InvictusNewProductsScraper:
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
@@ -144,7 +144,6 @@ class InvictusNewProductsScraper(multiprocessing.Process):
 class InvictusRestockMonitor(InvictusNewProductsScraper):
     def __init__(self, queue):
         super().__init__(queue)
-        self.db = DB()
         self.log = logging.getLogger(' InvictusRestockMonitor ').info
         self.cache = ListCache('InvictusRestockMonList')
 
@@ -155,6 +154,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         # self.loop.run_until_complete(self.get_prod_details(available_link))
 
     async def main(self):
+        self.db = DB()
         display = Display(visible=0, size=(1920, 1080))
         display.start()
         self.log('[+] Restock monitor is ready!')
