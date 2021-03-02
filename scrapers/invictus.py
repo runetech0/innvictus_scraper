@@ -35,13 +35,13 @@ class InvictusNewProductsScraper(multiprocessing.Process):
         ]
 
     def start(self):
-        display = Display(visible=0, size=(1920, 1080))
-        display.start()
         self.loop.run_until_complete(self.main())
         # test_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
         # self.loop.run_until_complete(self.get_prod_details(test_link))
 
     async def main(self):
+        display = Display(visible=0, size=(1920, 1080))
+        display.start()
         self.log('[+] Invictus monitor started!')
         await self.create_cache()
         while True:
@@ -155,6 +155,8 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         # self.loop.run_until_complete(self.get_prod_details(available_link))
 
     async def main(self):
+        display = Display(visible=0, size=(1920, 1080))
+        display.start()
         self.log('[+] Restock monitor is ready!')
         while True:
             restock_list = await self.db.get_inn_rs_list()
