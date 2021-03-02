@@ -14,9 +14,10 @@ from queue import Queue
 import configs.global_vars as global_vars
 import logging
 from models.cache import ListCache
+import multiprocessing
 
 
-class InvictusNewProductsScraper:
+class InvictusNewProductsScraper(multiprocessing.Process):
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
@@ -25,7 +26,7 @@ class InvictusNewProductsScraper:
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
-        self.log = logging.getLogger(' Innvicuts Scraper ').info
+        self.log = logging.getLogger(' InnvicutsScraper ').info
         self.cache = ListCache('InvictusScraper')
         self.itter_time = 300
         self.target_links = [
@@ -144,7 +145,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
     def __init__(self, queue):
         super().__init__(queue)
         self.db = DB()
-        self.log = logging.getLogger(' Invictus Restock Monitor ').info
+        self.log = logging.getLogger(' InvictusRestockMonitor ').info
         self.cache = ListCache('InvictusRestockMonList')
 
     def start(self):

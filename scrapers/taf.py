@@ -10,28 +10,29 @@ from bs4 import BeautifulSoup
 from models.products import TafProduct, TafSize
 from configs import global_vars
 from models.cache import ListCache
+import multiprocessing as mp
 
 
-class TafNewProdsScraper:
+class TafNewProdsScraper(mp.Process):
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
         self.cache = ListCache('TafNewScraper')
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('start-maximized')
-        options.add_argument('disable-infobars')
-        webdriver_path = self.config.get("WEBDRIVER_PATH")
-        self.driver = webdriver.Chrome(
-            executable_path=webdriver_path, options=options)
-        self.loop = asyncio.new_event_loop()
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument('--headless')
+        self.options.add_argument('--no-sandbox')
+        self.options.add_argument('--disable-dev-shm-usage')
+        self.options.add_argument('start-maximized')
+        self.options.add_argument('disable-infobars')
+        self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.URL = 'https://www.taf.com.mx/jordan'
         self.log = logging.getLogger(' TafNewProducts ').info
         self.itter_time = 30
 
     def start(self):
+        self.driver = webdriver.Chrome(
+            executable_path=self.webdriver_path, options=self.options)
+        self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.main())
 
     async def main(self):
@@ -109,7 +110,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
         super().__init__(queue)
         self.keyword = keyword
         self.URL = f'https://www.taf.com.mx/{self.keyword}'
-        self.log = logging.getLogger(' Taf Keyword Mon ').info
+        self.log = logging.getLogger(' TafKeywordMon ').info
         self.itter_time = 30
         self.cache = ListCache(f'TafKeyWordsMonitor_{self.keyword}')
 

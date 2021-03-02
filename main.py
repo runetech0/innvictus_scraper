@@ -48,35 +48,34 @@ async def on_ready():
     for ext in extensions:
         bot.load_extension(f'Cogs.{ext}')
 
-    # All the threads are connected through queues
-
-    # Products queue
-    products_queue = queue.Queue()
-
-    # Thread to scrape invictus new products and send to the sender thread
-    invictus = InvictusNewProductsScraper(products_queue)
-    multiprocessing.Process(target=invictus.start).start()
-    time.sleep(3)
-
-    # Invictus Product Restock Monoitor
-    mon = InvictusRestockMonitor(products_queue)
-    multiprocessing.Process(target=mon.start).start()
-    time.sleep(3)
-
-    # Start the taf threads
-    mon = TafNewProdsScraper(products_queue)
-    multiprocessing.Process(target=mon.start).start()
-    time.sleep(3)
-
-    keywords = ['Dunk']
-    for keyword in keywords:
-        mon = TafKeywordMonitor(products_queue, keyword)
-        threading.Thread(target=mon.start).start()
-        time.sleep(3)
-
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)
-    multiprocessing.Process(target=sender.start).start()
+    threading.Thread(target=sender.start).start()
+# All the threads are connected through queues
+
+# Products queue
+products_queue = queue.Queue()
+
+# Thread to scrape invictus new products and send to the sender thread
+mon = InvictusNewProductsScraper(products_queue)
+multiprocessing.Process(target=mon.start).start()
+time.sleep(3)
+
+# Invictus Product Restock Monoitor
+mon = InvictusRestockMonitor(products_queue)
+multiprocessing.Process(target=mon.start).start()
+time.sleep(3)
+
+# Start the taf threads
+mon = TafNewProdsScraper(products_queue)
+multiprocessing.Process(target=mon.start).start()
+time.sleep(3)
+
+keywords = ['Dunk']
+for keyword in keywords:
+    mon = TafKeywordMonitor(products_queue, keyword)
+    multiprocessing.Process(target=mon.start).start()
+    time.sleep(3)
 
 
 bot.run(BOT_TOKEN)
