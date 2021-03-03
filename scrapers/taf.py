@@ -114,7 +114,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.cache = ListCache(f'TafKeyWordsMonitor_{self.keyword}')
 
     async def main(self):
-        self.log(f'[+] Starting keyword monitor for {self.keyword}')
+        self.log(f'[+] Started keyword monitor for {self.keyword}')
         while not await self.has_prods():
             await asyncio.sleep(self.itter_time)
         await self.create_cache()

@@ -1,9 +1,9 @@
 from discord.ext import commands
 import json
 import threading
-import multiprocessing as mp
+import multiprocessing
 import queue
-from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
+from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor, start_new_prod_mon
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
 from extensions.sender import Sender
 import configs.global_vars as global_vars
@@ -11,6 +11,7 @@ import logging
 import os
 import discord
 import time
+from concurrent.futures import ProcessPoolExecutor
 
 
 logger = logging.getLogger()
@@ -35,6 +36,8 @@ bot = commands.Bot(command_prefix=prefix)
 
 BOT_TOKEN = config.get("BOT_TOKEN")
 
+executor = ProcessPoolExecutor()
+
 
 @bot.event
 async def on_ready():
@@ -48,34 +51,36 @@ async def on_ready():
     for ext in extensions:
         bot.load_extension(f'Cogs.{ext}')
 
-    # All the threads are connected through queues
-
-    # Products queue
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)
     threading.Thread(target=sender.start).start()
 
-products_queue = mp.Queue()
+
+# Products queue
+products_queue = multiprocessing.Queue()
+
+# All the processes are connected through queues
+
 # Thread to scrape invictus new products and send to the sender thread
 mon = InvictusNewProductsScraper(products_queue)
-mp.Process(target=mon.start).start()
+multiprocessing.Process(target=mon.start).start()
 time.sleep(3)
 
 # Invictus Product Restock Monoitor
 mon = InvictusRestockMonitor(products_queue)
-mp.Process(target=mon.start).start()
+multiprocessing.Process(target=mon.start).start()
 time.sleep(3)
 
 # Start the taf threads
 mon = TafNewProdsScraper(products_queue)
-mp.Process(target=mon.start).start()
+multiprocessing.Process(target=mon.start).start()
 time.sleep(3)
 
 keywords = ['Dunk']
 for keyword in keywords:
     mon = TafKeywordMonitor(products_queue, keyword)
-    mp.Process(target=mon.start).start()
+    multiprocessing.Process(target=mon.start).start()
     time.sleep(3)
 
 
-# bot.run(BOT_TOKEN)
+bot.run(BOT_TOKEN)

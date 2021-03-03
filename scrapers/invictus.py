@@ -185,3 +185,8 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
 if __name__ == '__main__':
     mon = InvictusNewProductsScraper(Queue())
     mon.start()
+
+
+def start_new_prod_mon(queue):
+    mon = InvictusNewProductsScraper(queue)
+    mon.start()
