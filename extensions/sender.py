@@ -36,6 +36,7 @@ class Sender:
         self.log('[+] Taf Channel found!')
 
     async def main(self):
+        print("Sender main")
         await self.read_up()
         self.log('[+] Sender is ready!')
         while True:

@@ -1,0 +1,73 @@
+from selenium import webdriver
+import asyncio
+import json
+from models.cache import ListCache
+from models.products import LiverPoolProduct
+from configs import global_vars
+
+
+class LiverPoolNewProdsScraper:
+    def __init__(self, queue):
+        self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
+        self.queue = queue
+        self.cache = ListCache('LiverPoolCache')
+        self.options = webdriver.ChromeOptions()
+        # self.options.add_argument('--headless')
+        self.webdriver_path = self.config.get("WEBDRIVER_PATH")
+        self.loop = asyncio.new_event_loop()
+        self.URL = 'https://www.liverpool.com.mx/tienda/zapatos/catst1105210'
+
+    def start(self):
+        self.loop.run_until_complete(self.main())
+
+    async def main(self):
+        await self.create_cache()
+        while True:
+            all_links = await self.get_all_prod_links()
+            for link in all_links:
+                if self.cache.in_cache(link):
+                    prod = await self.get_prod_details(link)
+                    self.queue.put(prod)
+
+    async def create_cache(self):
+        links = await self.get_all_prod_links()
+        self.cache.replace_cache(links)
+
+    async def get_all_prod_links(self):
+        self.driver = webdriver.Chrome(
+            executable_path=self.webdriver_path, options=self.options)
+        self.driver.implicitly_wait(10)
+        self.driver.get(self.URL)
+        prods_list = self.driver.find_elements_by_xpath(
+            '//li[@class="m-product__card card-masonry"]')
+        links = []
+        for prod in prods_list:
+            link = prod.find_element_by_tag_name('a').get_attribute('href')
+            links.append(link)
+        self.driver.quit()
+        return links
+
+    async def get_prod_details(self, link):
+        self.driver = webdriver.Chrome(
+            executable_path=self.webdriver_path, options=self.options)
+        self.driver.implicitly_wait(10)
+        self.driver.get(link)
+        prod = LiverPoolProduct()
+        prod.name = self.driver.find_element_by_xpath(
+            '//h1[@class="a-product__information--title"]').text
+        prod.link = link
+        out_of_stock_sizes = self.driver.find_elements_by_xpath(
+            '//button[@class="a-btn a-btn--actionpdp -disabled"]')
+        for size in out_of_stock_sizes:
+            prod.out_of_stock_sizes.append(size.text)
+        in_stock_sizes = self.driver.find_elements_by_xpath(
+            '//button[@class="a-btn a-btn--actionpdp"]')
+        for size in in_stock_sizes:
+            prod.in_stock_sizes.append(size.text)
+        prod.img_link = self.driver.find_element_by_xpath(
+            '//img[@id="image-real"]').get_attribute('src')
+        prod.color = self.driver.find_element_by_xpath(
+            '//p[@class="a-product__paragraphColor m-0 mt-2 mb-1"]').text.split(':')[-1].strip()
+
+        self.driver.quit()
+        return prod

@@ -36,3 +36,14 @@ class TafSize:
 class ProductStatus(enum.Enum):
     OUT_OF_STOCK = 'Out of Stock'
     IN_STOCK = 'In Stock'
+
+
+class LiverPoolProduct:
+    def __init__(self):
+        self.name = None
+        self.link = None
+        self.img_link = None
+        self.price = None
+        self.in_stock_sizes = []
+        self.out_of_stock_sizes = []
+        self.color = None

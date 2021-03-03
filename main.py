@@ -11,7 +11,7 @@ import logging
 import os
 import discord
 import time
-from concurrent.futures import ProcessPoolExecutor
+from Cogs.bot import start_bot
 
 
 logger = logging.getLogger()
@@ -31,35 +31,14 @@ logger.addHandler(consoleHandler)
 
 config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
 
-prefix = config.get('COMMAND_PREFIX')
-bot = commands.Bot(command_prefix=prefix)
-
-BOT_TOKEN = config.get("BOT_TOKEN")
-
-executor = ProcessPoolExecutor()
-
-
-@bot.event
-async def on_ready():
-    print('[+] We have logged in as {0.user}'.format(bot))
-    print('[+] Loading extensions ...')
-    channel_id = config.get("INNVICTUS_CHANNEL_ID")
-    innvictus_channel = discord.utils.get(
-        bot.guilds[0].channels, id=channel_id)
-    # await innvictus_channel.send('Now online!')
-    extensions = ['innvictus_commands']
-    for ext in extensions:
-        bot.load_extension(f'Cogs.{ext}')
-
-    # Thread to send the output messages to the channels
-    sender = Sender(bot, products_queue)
-    threading.Thread(target=sender.start).start()
 
 os.system('pkill chrom')
 os.system('pkill Xvfb')
 
 # Products queue
 products_queue = multiprocessing.Queue()
+
+multiprocessing.Process(target=start_bot, args=(products_queue,)).start()
 
 # All the processes are connected through queues
 
@@ -85,4 +64,4 @@ for keyword in keywords:
     time.sleep(3)
 
 
-bot.run(BOT_TOKEN)
+# bot.run(BOT_TOKEN)
