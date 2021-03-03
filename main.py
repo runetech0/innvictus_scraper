@@ -43,7 +43,7 @@ async def on_ready():
     channel_id = config.get("INNVICTUS_CHANNEL_ID")
     innvictus_channel = discord.utils.get(
         bot.guilds[0].channels, id=channel_id)
-    await innvictus_channel.send('Now online!')
+    # await innvictus_channel.send('Now online!')
     extensions = ['innvictus_commands']
     for ext in extensions:
         bot.load_extension(f'Cogs.{ext}')
@@ -51,31 +51,31 @@ async def on_ready():
     # All the threads are connected through queues
 
     # Products queue
-    products_queue = mp.Queue()
     # Thread to send the output messages to the channels
     sender = Sender(bot, products_queue)
     threading.Thread(target=sender.start).start()
 
-    # Thread to scrape invictus new products and send to the sender thread
-    mon = InvictusNewProductsScraper(products_queue)
-    mp.Process(target=mon.start, daemon=True).start()
+products_queue = mp.Queue()
+# Thread to scrape invictus new products and send to the sender thread
+mon = InvictusNewProductsScraper(products_queue)
+mp.Process(target=mon.start).start()
+time.sleep(3)
+
+# Invictus Product Restock Monoitor
+mon = InvictusRestockMonitor(products_queue)
+mp.Process(target=mon.start).start()
+time.sleep(3)
+
+# Start the taf threads
+mon = TafNewProdsScraper(products_queue)
+mp.Process(target=mon.start).start()
+time.sleep(3)
+
+keywords = ['Dunk']
+for keyword in keywords:
+    mon = TafKeywordMonitor(products_queue, keyword)
+    mp.Process(target=mon.start).start()
     time.sleep(3)
 
-    # Invictus Product Restock Monoitor
-    mon = InvictusRestockMonitor(products_queue)
-    mp.Process(target=mon.start, daemon=True).start()
-    time.sleep(3)
 
-    # Start the taf threads
-    mon = TafNewProdsScraper(products_queue)
-    mp.Process(target=mon.start, daemon=True).start()
-    time.sleep(3)
-
-    keywords = ['Dunk']
-    for keyword in keywords:
-        mon = TafKeywordMonitor(products_queue, keyword)
-        mp.Process(target=mon.start, daemon=True).start()
-        time.sleep(3)
-
-
-bot.run(BOT_TOKEN)
+# bot.run(BOT_TOKEN)
