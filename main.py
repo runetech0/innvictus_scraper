@@ -55,6 +55,8 @@ async def on_ready():
     sender = Sender(bot, products_queue)
     threading.Thread(target=sender.start).start()
 
+os.system('pkill chrom')
+os.system('pkill Xvfb')
 
 # Products queue
 products_queue = multiprocessing.Queue()
