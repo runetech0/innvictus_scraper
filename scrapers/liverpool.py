@@ -4,18 +4,20 @@ import json
 from models.cache import ListCache
 from models.products import LiverPoolProduct
 from configs import global_vars
+import logging
 
 
 class LiverPoolNewProdsScraper:
-    def __init__(self, queue):
+    def __init__(self, queue, link):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
         self.cache = ListCache('LiverPoolCache')
+        self.log = logging.getLogger(' LiverpoolMonitor ').info
         self.options = webdriver.ChromeOptions()
-        # self.options.add_argument('--headless')
+        self.options.add_argument('--headless')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
-        self.URL = 'https://www.liverpool.com.mx/tienda/zapatos/catst1105210'
+        self.URL = link
 
     def start(self):
         self.loop.run_until_complete(self.main())
@@ -24,8 +26,9 @@ class LiverPoolNewProdsScraper:
         await self.create_cache()
         while True:
             all_links = await self.get_all_prod_links()
+            self.log(f'[+] Got {len(all_links)} prod links!')
             for link in all_links:
-                if self.cache.in_cache(link):
+                if not self.cache.in_cache(link):
                     prod = await self.get_prod_details(link)
                     self.queue.put(prod)
 
@@ -34,6 +37,7 @@ class LiverPoolNewProdsScraper:
         self.cache.replace_cache(links)
 
     async def get_all_prod_links(self):
+        self.log('[+] Getting all the prod links ...')
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
@@ -68,6 +72,8 @@ class LiverPoolNewProdsScraper:
             '//img[@id="image-real"]').get_attribute('src')
         prod.color = self.driver.find_element_by_xpath(
             '//p[@class="a-product__paragraphColor m-0 mt-2 mb-1"]').text.split(':')[-1].strip()
+        prod.price = self.driver.find_element_by_xpath(
+            '//p[@class="a-product__paragraphDiscountPrice m-0 d-inline "]').text.split('\n')[0].replace(',', '').replace('$', '')
 
         self.driver.quit()
         return prod

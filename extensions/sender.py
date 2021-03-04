@@ -1,6 +1,6 @@
 import queue
 import asyncio
-from models.products import InvictusProduct, TafProduct
+from models.products import InvictusProduct, TafProduct, LiverPoolProduct
 import json
 import discord
 import configs.global_vars as global_vars

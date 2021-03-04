@@ -1,17 +1,14 @@
-from discord.ext import commands
 import json
-import threading
-import multiprocessing
+import multiprocessing as mp
 import queue
 from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor, start_new_prod_mon
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
+from scrapers.liverpool import LiverPoolNewProdsScraper
 from extensions.sender import Sender
-import configs.global_vars as global_vars
+from Cogs.bot import start_bot
 import logging
 import os
-import discord
 import time
-from Cogs.bot import start_bot
 
 
 logger = logging.getLogger()
@@ -29,39 +26,47 @@ fileHandler.setFormatter(formator)
 logger.addHandler(fileHandler)
 logger.addHandler(consoleHandler)
 
-config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
-
-
+# Kill existing chrome browser and Xvfb
+# processes running because of low system memory.
 os.system('pkill chrom')
 os.system('pkill Xvfb')
 
 # Products queue
-products_queue = multiprocessing.Queue()
+products_queue = mp.Queue()
 
-multiprocessing.Process(target=start_bot, args=(products_queue,)).start()
+mp.Process(target=start_bot, args=(products_queue,)).start()
 
 # All the processes are connected through queues
 
 # Thread to scrape invictus new products and send to the sender thread
 mon = InvictusNewProductsScraper(products_queue)
-multiprocessing.Process(target=mon.start).start()
+mp.Process(target=mon.start).start()
 time.sleep(3)
 
 # Invictus Product Restock Monoitor
 mon = InvictusRestockMonitor(products_queue)
-multiprocessing.Process(target=mon.start).start()
+mp.Process(target=mon.start).start()
 time.sleep(3)
 
 # Start the taf threads
 mon = TafNewProdsScraper(products_queue)
-multiprocessing.Process(target=mon.start).start()
+mp.Process(target=mon.start).start()
 time.sleep(3)
 
-keywords = ['Dunk']
-for keyword in keywords:
-    mon = TafKeywordMonitor(products_queue, keyword)
-    multiprocessing.Process(target=mon.start).start()
+
+liverpool_links = [
+    'https://www.liverpool.com.mx/tienda/zapatos/catst1105210',
+    'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
+    'https://www.liverpool.com.mx/tienda/zapatos/catst1011086'
+]
+
+for link in liverpool_links:
+    mon = LiverPoolNewProdsScraper(products_queue, link)
+    mp.Process(target=mon.start).start()
     time.sleep(3)
 
-
-# bot.run(BOT_TOKEN)
+keywords = ['Nike Dunk']
+for keyword in keywords:
+    mon = TafKeywordMonitor(products_queue, keyword)
+    mp.Process(target=mon.start).start()
+    time.sleep(3)

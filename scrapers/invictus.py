@@ -26,7 +26,7 @@ class InvictusNewProductsScraper:
         self.loop = asyncio.new_event_loop()
         self.log = logging.getLogger(' InnvicutsScraper ').info
         self.cache = ListCache('InvictusScraper')
-        self.itter_time = 300
+        self.itter_time = 200
         self.target_links = [
             'https://www.innvictus.com/mujeres/c/mujeres',
             'https://www.innvictus.com/jordan/c/jordan',
@@ -58,7 +58,8 @@ class InvictusNewProductsScraper:
                         self.cache.add_cache(link)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
-                print('Blind exception')
+                print('Blind exception in invictus new prod')
+                print(e)
 
     async def create_cache(self):
         self.log('[+] Creating cache for the products ..')
@@ -175,8 +176,9 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
                         self.queue.put(prod)
                         await self.db.remove_inn_rs_list(link)
                         await asyncio.sleep(1)
-            except:
-                print('Blind exception')
+            except Exception as e:
+                print('Blind exception in invictus restock')
+                print(e)
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)

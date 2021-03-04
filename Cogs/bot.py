@@ -5,13 +5,13 @@ import json
 from extensions.sender import Sender
 import threading
 import asyncio
-from models.products import InvictusProduct, TafProduct
+from models.products import InvictusProduct, TafProduct, LiverPoolProduct
 import logging
 
 
 config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
 prefix = config.get('COMMAND_PREFIX')
-bot = commands.Bot(command_prefix=prefix)
+bot = commands.Bot(command_prefix=prefix, heartbeat_timeout=600.0)
 
 BOT_TOKEN = config.get("BOT_TOKEN")
 
@@ -70,23 +70,45 @@ async def create_taf_embed(prod:  TafProduct):
     return embed
 
 
+async def create_liverpool_embed(prod: LiverPoolProduct):
+    embed = discord.Embed()
+    embed.title = prod.name
+    embed.add_field(name='Price', value=f'${prod.price}', inline=False)
+    embed.url = prod.link
+    embed.set_image(url=prod.img_link)
+    embed.add_field(name='Prod Color', value=prod.color, inline=False)
+    desc = '**In-Stock Sizes**'
+    for size in prod.in_stock_sizes:
+        desc = f'{desc}\n{size}'
+    desc = f'{desc}\n**Out-of-Stock Sizes**'
+    for size in prod.out_of_stock_sizes:
+        desc = f'{desc}\n{size}'
+    embed.description = desc
+    return embed
+
+
 async def after_ready(products_queue):
     while not bot.is_ready():
         await asyncio.sleep(1)
     innvictus_ch_id = config.get("INNVICTUS_CHANNEL_ID")
     taf_channel_id = config.get("TAF_CHANNEL_ID")
+    liverpool_channel_id = config.get("LIVERPOOL_CHANNEL_ID")
     innvictus_channel = discord.utils.get(
         bot.guilds[0].channels, id=innvictus_ch_id)
     taf_channel = discord.utils.get(
         bot.guilds[0].channels, id=taf_channel_id)
+    liverpool_channel = discord.utils.get(
+        bot.guilds[0].channels, id=liverpool_channel_id)
     if innvictus_channel:
         log('[+] Innvictus channel found!')
     if taf_channel:
         log('[+] Taf channel found!')
+    if liverpool_channel:
+        log('[+] Liverpool Channel found!')
 
     while True:
         while products_queue.empty():
-            await asyncio.sleep(1)
+            await asyncio.sleep(3)
         prod = products_queue.get(block=False)
         if isinstance(prod, InvictusProduct):
             embed = await create_innvictus_embed(prod)
@@ -94,12 +116,9 @@ async def after_ready(products_queue):
         elif isinstance(prod, TafProduct):
             embed = await create_taf_embed(prod)
             await taf_channel.send(embed=embed)
-
-    # Thread to send the output messages to the channels
-    # sender = Sender(bot, products_queue)
-    # t = threading.Thread(target=sender.start)
-    # t.start()
-    # t.join()
+        elif isinstance(prod, LiverPoolProduct):
+            embed = await create_liverpool_embed(prod)
+            await liverpool_channel.send(embed=embed)
 
 
 def start_bot(products_queue):
