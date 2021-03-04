@@ -47,8 +47,10 @@ class TafNewProdsScraper:
             await asyncio.sleep(self.itter_time)
 
     async def create_cache(self):
+        self.log('[+] Creating cache ..')
         links = await self.get_all_prods_links()
         self.cache.replace_cache(links)
+        self.log('[+] Created cache for prods')
 
     async def get_all_prods_links(self):
         self.driver.get(self.URL)

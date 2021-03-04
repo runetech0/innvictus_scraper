@@ -33,8 +33,10 @@ class LiverPoolNewProdsScraper:
                     self.queue.put(prod)
 
     async def create_cache(self):
+        self.log('[+] Creating cache ..')
         links = await self.get_all_prod_links()
         self.cache.replace_cache(links)
+        self.log('[+] Created cache for prods')
 
     async def get_all_prod_links(self):
         self.log('[+] Getting all the prod links ...')
