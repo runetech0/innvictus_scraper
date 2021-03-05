@@ -35,8 +35,7 @@ class InvictusNewProductsScraper:
         ]
 
     def start(self):
-        asyncio.run(self.main())
-        # self.loop.run_until_complete(self.main())
+        self.loop.run_until_complete(self.main())
         # test_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
         # self.loop.run_until_complete(self.get_prod_details(test_link))
 
@@ -71,7 +70,6 @@ class InvictusNewProductsScraper:
     async def get_all_prod_links(self) -> list:
         to_return = []
         for link in self.target_links:
-            # self.log(f'[+] Getting products from {link}')
             tries = 0
             while True:
                 self.driver = get_chromedriver(
