@@ -31,9 +31,9 @@ class TafNewProdsScraper:
     def start(self):
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
-        asyncio.run(self.main())
-        # self.loop = asyncio.new_event_loop()
-        # self.loop.run_until_complete(self.main())
+        # asyncio.run(self.main())
+        self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(self.main())
 
     async def main(self):
         self.log('[+] Taf New Prods Scraper is up!')

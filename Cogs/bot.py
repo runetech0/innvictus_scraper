@@ -126,7 +126,7 @@ async def after_ready(products_queue):
 def start_bot(products_queue):
     try:
         bot.loop.create_task(after_ready(products_queue))
-        bot.run(BOT_TOKEN, reconnect=True)
+        bot.run(BOT_TOKEN)
     except discord.errors.ConnectionClosed:
         print('WS Connection closed!')
         bot.connect(reconnect=True)
