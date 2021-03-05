@@ -31,8 +31,6 @@ def get_user_agent():
 def get_chromedriver(use_proxy=False, chrome_options=None, executable_path=None):
     PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS = get_proxy()
     user_agent = get_user_agent()
-    config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
-    # CHROME_LOCATION = config.get("CHROME_LOCATION")
 
     manifest_json = """
     {

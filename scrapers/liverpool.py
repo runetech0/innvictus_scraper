@@ -14,7 +14,11 @@ class LiverPoolNewProdsScraper:
         self.cache = ListCache('LiverPoolCache')
         self.log = logging.getLogger(' LiverpoolMonitor ').info
         self.options = webdriver.ChromeOptions()
+        self.options.add_argument('--no-sandbox')
         self.options.add_argument('--headless')
+        self.options.add_argument('--disable-dev-shm-usage')
+        self.options.add_argument('start-maximized')
+        self.options.add_argument('disable-infobars')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
         self.URLs = [
@@ -22,13 +26,10 @@ class LiverPoolNewProdsScraper:
             'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
             'https://www.liverpool.com.mx/tienda/zapatos/catst1011086'
         ]
+        self.itter_time = 120
 
     def start(self):
-        self.driver = webdriver.Chrome(
-            executable_path=self.webdriver_path, options=self.options)
-        self.driver.implicitly_wait(10)
         self.loop.run_until_complete(self.main())
-        # asyncio.run(self.main())
 
     async def start_driver(self):
         self.driver = webdriver.Chrome(
@@ -45,6 +46,7 @@ class LiverPoolNewProdsScraper:
                     prod = await self.get_prod_details(link)
                     self.queue.put(prod)
                     self.cache.add_cache(link)
+            await asyncio.sleep(self.itter_time)
 
     async def create_cache(self):
         self.log('[+] Creating cache ..')

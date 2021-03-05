@@ -30,35 +30,37 @@ logger.addHandler(consoleHandler)
 # processes running because of low system memory.
 os.system('pkill chrom')
 os.system('pkill Xvfb')
+psd = 10
 
 # Products queue
 products_queue = mp.Queue()
 
 mp.Process(target=start_bot, args=(products_queue,)).start()
+time.sleep(psd)
 
 # All the processes are connected through queues
 
 # Thread to scrape invictus new products and send to the sender thread
 mon = InvictusNewProductsScraper(products_queue)
 mp.Process(target=mon.start).start()
-time.sleep(3)
+time.sleep(psd)
 
 # Invictus Product Restock Monoitor
 mon = InvictusRestockMonitor(products_queue)
 mp.Process(target=mon.start).start()
-time.sleep(3)
+time.sleep(psd)
 
 # Start the taf threads
 mon = TafNewProdsScraper(products_queue)
 mp.Process(target=mon.start).start()
-time.sleep(3)
+time.sleep(psd)
 
 
 mon = LiverPoolNewProdsScraper(products_queue)
 mp.Process(target=mon.start).start()
-time.sleep(3)
+time.sleep(psd)
 
 keywords = ['Nike dunk']
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
-time.sleep(3)
+time.sleep(psd)
