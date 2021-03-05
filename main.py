@@ -54,12 +54,6 @@ mp.Process(target=mon.start).start()
 time.sleep(3)
 
 
-liverpool_links = [
-    'https://www.liverpool.com.mx/tienda/zapatos/catst1105210',
-    'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
-    'https://www.liverpool.com.mx/tienda/zapatos/catst1011086'
-]
-
 for link in liverpool_links:
     mon = LiverPoolNewProdsScraper(products_queue, link)
     mp.Process(target=mon.start).start()

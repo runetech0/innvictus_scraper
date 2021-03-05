@@ -17,7 +17,11 @@ class LiverPoolNewProdsScraper:
         self.options.add_argument('--headless')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
-        self.URL = link
+        self.URLs = [
+            'https://www.liverpool.com.mx/tienda/zapatos/catst1105210',
+            'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
+            'https://www.liverpool.com.mx/tienda/zapatos/catst1011086'
+        ]
 
     def start(self):
         self.loop.run_until_complete(self.main())
@@ -43,13 +47,14 @@ class LiverPoolNewProdsScraper:
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
-        self.driver.get(self.URL)
-        prods_list = self.driver.find_elements_by_xpath(
-            '//li[@class="m-product__card card-masonry"]')
         links = []
-        for prod in prods_list:
-            link = prod.find_element_by_tag_name('a').get_attribute('href')
-            links.append(link)
+        for url in self.URLs:
+            self.driver.get(url)
+            prods_list = self.driver.find_elements_by_xpath(
+                '//li[@class="m-product__card card-masonry"]')
+            for prod in prods_list:
+                link = prod.find_element_by_tag_name('a').get_attribute('href')
+                links.append(link)
         self.driver.quit()
         return links
 
