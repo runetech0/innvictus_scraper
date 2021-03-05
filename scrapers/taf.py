@@ -26,7 +26,7 @@ class TafNewProdsScraper:
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.URL = 'https://www.taf.com.mx/jordan'
         self.log = logging.getLogger(' TafNewProducts ').info
-        self.itter_time = 30
+        self.itter_time = 120
 
     def start(self):
         self.driver = webdriver.Chrome(
@@ -113,7 +113,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.keywords = keywords
         self.base_URL = f'https://www.taf.com.mx'
         self.log = logging.getLogger(' TafKeywordMon ').info
-        self.itter_time = 30
+        self.itter_time = 120
         self.cache = ListCache(f'TafKeyWordsMonitor')
 
     async def main(self):
@@ -132,6 +132,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
                     if not self.cache.in_cache(link):
                         prod_details = await self.get_prod_details(link)
                         self.queue.put(prod_details)
+                        self.cache.add_cache(link)
                 temp_cache.extend(prod_links)
             self.cache.replace_cache(temp_cache)
             await asyncio.sleep(self.itter_time)
