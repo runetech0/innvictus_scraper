@@ -30,6 +30,11 @@ class LiverPoolNewProdsScraper:
         self.loop.run_until_complete(self.main())
         # asyncio.run(self.main())
 
+    async def start_driver(self):
+        self.driver = webdriver.Chrome(
+            executable_path=self.webdriver_path, options=self.options)
+        self.driver.implicitly_wait(10)
+
     async def main(self):
         await self.create_cache()
         while True:
@@ -49,6 +54,7 @@ class LiverPoolNewProdsScraper:
 
     async def get_all_prod_links(self):
         self.log('[+] Getting all the prod links ...')
+        await self.start_driver()
         links = []
         for url in self.URLs:
             self.driver.get(url)
@@ -57,9 +63,11 @@ class LiverPoolNewProdsScraper:
             for prod in prods_list:
                 link = prod.find_element_by_tag_name('a').get_attribute('href')
                 links.append(link)
+        self.driver.quit()
         return links
 
     async def get_prod_details(self, link):
+        await self.start_driver()
         self.driver.get(link)
         prod = LiverPoolProduct()
         prod.name = self.driver.find_element_by_xpath(
@@ -79,5 +87,5 @@ class LiverPoolNewProdsScraper:
             '//p[@class="a-product__paragraphColor m-0 mt-2 mb-1"]').text.split(':')[-1].strip()
         prod.price = self.driver.find_element_by_xpath(
             '//p[@class="a-product__paragraphDiscountPrice m-0 d-inline "]').text.split('\n')[0].replace(',', '').replace('$', '')
-
+        self.driver.quit()
         return prod

@@ -29,10 +29,13 @@ class TafNewProdsScraper:
         self.itter_time = 120
 
     def start(self):
-        self.driver = webdriver.Chrome(
-            executable_path=self.webdriver_path, options=self.options)
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.main())
+
+    async def start_driver(self):
+        self.driver = webdriver.Chrome(
+            executable_path=self.webdriver_path, options=self.options)
+        self.driver.implicitly_wait(10)
 
     async def main(self):
         self.log('[+] Taf New Prods Scraper is up!')
@@ -54,6 +57,7 @@ class TafNewProdsScraper:
         self.log('[+] Created cache for prods')
 
     async def get_all_prods_links(self):
+        await self.start_driver()
         self.driver.get(self.URL)
         try:
             WebDriverWait(self.driver, 60).until(
@@ -68,9 +72,11 @@ class TafNewProdsScraper:
             prod_link = prod.find_element_by_tag_name(
                 'a').get_attribute('href')
             links.append(prod_link)
+        self.driver.quit()
         return links
 
     async def get_prod_details(self, link):
+        await self.start_driver()
         self.driver.get(link)
         try:
             WebDriverWait(self.driver, 60).until(
@@ -104,6 +110,7 @@ class TafNewProdsScraper:
             size.atc = self.driver.find_element_by_class_name(
                 'buy-in-page-button').get_attribute('href').replace('redirect=false', 'redirect=true')
             p.in_stock_sizes.append(size)
+        self.driver.quit()
         return p
 
 
@@ -138,9 +145,12 @@ class TafKeywordMonitor(TafNewProdsScraper):
             await asyncio.sleep(self.itter_time)
 
     async def has_prods(self, link):
+        await self.start_driver()
         self.driver.get(link)
         try:
             self.driver.find_element_by_class_name('head-tittle')
+            self.driver.quit()
             return False
         except exceptions.NoSuchElementException:
+            self.driver.quit()
             return True

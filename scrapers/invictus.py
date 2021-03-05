@@ -86,6 +86,7 @@ class InvictusNewProductsScraper:
                 except Exception as e:
                     tries += 1
                     if tries >= 5:
+                        self.driver.quit()
                         raise e
                     self.log(
                         f'[-] Could not load page in try {tries} : {link}')
@@ -112,6 +113,7 @@ class InvictusNewProductsScraper:
                 await self.load_prod_page(link)
                 break
             except Exception as e:
+                self.log('[-] Failed to load driver')
                 continue
         try:
             WebDriverWait(self.driver, 60).until(
