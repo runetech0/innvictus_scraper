@@ -30,6 +30,12 @@ async def on_ready():
             pass
 
 
+@bot.event
+async def on_error(error):
+    print('Got error in on_error')
+    print(error)
+
+
 async def create_innvictus_embed(prod:  InvictusProduct):
     embed = discord.Embed()
     embed.title = prod.prod_name
@@ -118,5 +124,9 @@ async def after_ready(products_queue):
 
 
 def start_bot(products_queue):
-    bot.loop.create_task(after_ready(products_queue))
-    bot.run(BOT_TOKEN)
+    try:
+        bot.loop.create_task(after_ready(products_queue))
+        bot.run(BOT_TOKEN, reconnect=True)
+    except discord.errors.ConnectionClosed:
+        print('WS Connection closed!')
+        bot.connect(reconnect=True)

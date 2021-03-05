@@ -8,7 +8,7 @@ import logging
 
 
 class LiverPoolNewProdsScraper:
-    def __init__(self, queue, link):
+    def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
         self.cache = ListCache('LiverPoolCache')
@@ -16,7 +16,7 @@ class LiverPoolNewProdsScraper:
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--headless')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
-        self.loop = asyncio.new_event_loop()
+        # self.loop = asyncio.new_event_loop()
         self.URLs = [
             'https://www.liverpool.com.mx/tienda/zapatos/catst1105210',
             'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
@@ -24,7 +24,8 @@ class LiverPoolNewProdsScraper:
         ]
 
     def start(self):
-        self.loop.run_until_complete(self.main())
+        # self.loop.run_until_complete(self.main())
+        asyncio.run(self.main())
 
     async def main(self):
         await self.create_cache()

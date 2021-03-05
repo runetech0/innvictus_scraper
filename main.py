@@ -54,13 +54,11 @@ mp.Process(target=mon.start).start()
 time.sleep(3)
 
 
-for link in liverpool_links:
-    mon = LiverPoolNewProdsScraper(products_queue, link)
-    mp.Process(target=mon.start).start()
-    time.sleep(3)
+mon = LiverPoolNewProdsScraper(products_queue)
+mp.Process(target=mon.start).start()
+time.sleep(3)
 
-keywords = ['Nike Dunk']
-for keyword in keywords:
-    mon = TafKeywordMonitor(products_queue, keyword)
-    mp.Process(target=mon.start).start()
-    time.sleep(3)
+keywords = ['Nike dunk']
+mon = TafKeywordMonitor(products_queue, keywords)
+mp.Process(target=mon.start).start()
+time.sleep(3)

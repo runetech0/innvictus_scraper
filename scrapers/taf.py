@@ -31,8 +31,9 @@ class TafNewProdsScraper:
     def start(self):
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
-        self.loop = asyncio.new_event_loop()
-        self.loop.run_until_complete(self.main())
+        asyncio.run(self.main())
+        # self.loop = asyncio.new_event_loop()
+        # self.loop.run_until_complete(self.main())
 
     async def main(self):
         self.log('[+] Taf New Prods Scraper is up!')
@@ -101,36 +102,41 @@ class TafNewProdsScraper:
                 continue
             sku.click()
             size.atc = self.driver.find_element_by_class_name(
-                'buy-in-page-button').get_attribute('href')
+                'buy-in-page-button').get_attribute('href').replace('redirect=false', 'redirect=true')
             p.in_stock_sizes.append(size)
         return p
 
 
 class TafKeywordMonitor(TafNewProdsScraper):
-    def __init__(self, queue, keyword):
+    def __init__(self, queue, keywords):
         super().__init__(queue)
-        self.keyword = keyword
-        self.URL = f'https://www.taf.com.mx/{self.keyword}'
+        self.keywords = keywords
+        self.base_URL = f'https://www.taf.com.mx'
         self.log = logging.getLogger(' TafKeywordMon ').info
         self.itter_time = 30
-        self.cache = ListCache(f'TafKeyWordsMonitor_{self.keyword}')
+        self.cache = ListCache(f'TafKeyWordsMonitor')
 
     async def main(self):
-        self.log(f'[+] Started keyword monitor for {self.keyword}')
-        while not await self.has_prods():
-            await asyncio.sleep(self.itter_time)
-        await self.create_cache()
+        self.log(f'[+] Started Taf keyword monitor')
         while True:
-            links = await self.get_all_prods_links()
-            for link in links:
-                if not self.cache.in_cache(link):
-                    prod_details = await self.get_prod_details(link)
-                    self.queue.put(prod_details)
-            self.cache.replace_cache(links)
+            for keyword in self.keywords:
+                temp_cache = []
+                target_link = f'{self.base_URL}/{keyword}'
+                if not await self.has_prods(target_link):
+                    await asyncio.sleep(3)
+                    continue
+                self.URL = target_link
+                prod_links = await self.get_all_prods_links()
+                for link in prod_links:
+                    if not self.cache.in_cache(link):
+                        prod_details = await self.get_prod_details(link)
+                        self.queue.put(prod_details)
+                temp_cache.extend(prod_links)
+            self.cache.replace_cache(temp_cache)
             await asyncio.sleep(self.itter_time)
 
-    async def has_prods(self):
-        self.driver.get(self.URL)
+    async def has_prods(self, link):
+        self.driver.get(link)
         try:
             self.driver.find_element_by_class_name('head-tittle')
             return False

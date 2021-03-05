@@ -23,7 +23,7 @@ class InvictusNewProductsScraper:
         self.queue = queue
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
-        self.loop = asyncio.new_event_loop()
+        # self.loop = asyncio.new_event_loop()
         self.log = logging.getLogger(' InnvicutsScraper ').info
         self.cache = ListCache('InvictusScraper')
         self.itter_time = 200
@@ -35,7 +35,8 @@ class InvictusNewProductsScraper:
         ]
 
     def start(self):
-        self.loop.run_until_complete(self.main())
+        asyncio.run(self.main())
+        # self.loop.run_until_complete(self.main())
         # test_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
         # self.loop.run_until_complete(self.get_prod_details(test_link))
 
@@ -157,7 +158,8 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         self.cache = ListCache('InvictusRestockMonList')
 
     def start(self):
-        self.loop.run_until_complete(self.main())
+        # self.loop.run_until_complete(self.main())
+        asyncio.run(self.main())
         # na_product_link = 'https://www.innvictus.com/mujeres/casual/tenis/nike/tenis-nike-dunk-low-coast/p/000000000000186482'
         # available_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
         # self.loop.run_until_complete(self.get_prod_details(available_link))
