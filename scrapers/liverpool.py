@@ -39,6 +39,7 @@ class LiverPoolNewProdsScraper:
                 if not self.cache.in_cache(link):
                     prod = await self.get_prod_details(link)
                     self.queue.put(prod)
+                    self.cache.add_cache(link)
 
     async def create_cache(self):
         self.log('[+] Creating cache ..')
