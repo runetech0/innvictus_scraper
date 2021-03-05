@@ -45,6 +45,7 @@ class InvictusNewProductsScraper:
         self.log('[+] Invictus monitor started!')
         await self.create_cache()
         while True:
+            self.log('[+] Invictus New Prod Monitor Checking for new prods')
             try:
                 all_prods = await self.get_all_prod_links()
                 self.log(f'[+] Got {len(all_prods)} products')
@@ -168,14 +169,16 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         display.start()
         self.log('[+] Restock monitor is ready!')
         while True:
+            self.log('[+] Invictus Restock Checking for restock')
             try:
                 restock_list = await self.db.get_inn_rs_list()
                 for link in restock_list:
                     if await self.prod_in_stock(link):
+                        self.log(f'[+] Got restock : {link}')
                         prod = await self.get_prod_details(link)
                         self.queue.put(prod)
                         await self.db.remove_inn_rs_list(link)
-                        await asyncio.sleep(1)
+                    await asyncio.sleep(1)
             except Exception as e:
                 print('Blind exception in invictus restock')
                 print(e)

@@ -1,0 +1,55 @@
+[2021-03-05 13:39:42,353] - [discord.client] - INFO - logging in using static token
+[2021-03-05 13:39:42,453] - [ InnvicutsScraper ] - INFO - [+] Invictus monitor started!
+[2021-03-05 13:39:42,454] - [ InnvicutsScraper ] - INFO - [+] Creating cache for the products ..
+[2021-03-05 13:39:43,743] - [discord.gateway] - INFO - Shard ID None has sent the IDENTIFY payload.
+[2021-03-05 13:39:44,155] - [discord.gateway] - INFO - Shard ID None has connected to Gateway: ["gateway-prd-main-7s4q",{"micros":39570,"calls":["discord-sessions-prd-2-88",{"micros":38270,"calls":["start_session",{"micros":25915,"calls":["api-prd-main-3lfv",{"micros":22992,"calls":["get_user",{"micros":2162},"add_authorized_ip",{"micros":1212},"get_guilds",{"micros":4296},"coros_wait",{"micros":0}]}]},"guilds_connect",{"micros":2,"calls":[]},"presence_connect",{"micros":11613,"calls":[]}]}]}] (Session ID: 51df10ce4a54eb756c96e8503d3d326a).
+[2021-03-05 13:39:45,477] - [ InvictusRestockMonitor ] - INFO - [+] Restock monitor is ready!
+[2021-03-05 13:39:45,478] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:39:46,357] - [DiscordBot] - INFO - [+] Innvictus channel found!
+[2021-03-05 13:39:46,358] - [DiscordBot] - INFO - [+] Taf channel found!
+[2021-03-05 13:39:46,358] - [DiscordBot] - INFO - [+] Liverpool Channel found!
+[2021-03-05 13:39:49,669] - [ TafNewProducts ] - INFO - [+] Taf New Prods Scraper is up!
+[2021-03-05 13:39:49,669] - [ TafNewProducts ] - INFO - [+] Creating cache ..
+[2021-03-05 13:39:51,389] - [ LiverpoolMonitor ] - INFO - [+] Creating cache ..
+[2021-03-05 13:39:51,390] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:39:55,683] - [ TafKeywordMon ] - INFO - [+] Started Taf keyword monitor
+[2021-03-05 13:40:14,687] - [ TafNewProducts ] - INFO - [+] Created cache for prods
+[2021-03-05 13:40:18,695] - [ TafNewProducts ] - INFO - [+] Got 12 prod links
+[2021-03-05 13:40:18,780] - [ TafKeywordMon ] - INFO - [+] Got 1 prod links
+[2021-03-05 13:40:21,805] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:40:31,763] - [ LiverpoolMonitor ] - INFO - [+] Created cache for prods
+[2021-03-05 13:40:31,763] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:40:47,786] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:40:51,721] - [ TafNewProducts ] - INFO - [+] Got 12 prod links
+[2021-03-05 13:40:57,820] - [ LiverpoolMonitor ] - INFO - [+] Got 119 prod links!
+[2021-03-05 13:40:57,868] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:41:10,501] - [ TafKeywordMon ] - INFO - [+] Got 1 prod links
+[2021-03-05 13:41:11,153] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:41:24,004] - [ TafNewProducts ] - INFO - [+] Got 12 prod links
+[2021-03-05 13:41:24,096] - [ LiverpoolMonitor ] - INFO - [+] Got 119 prod links!
+[2021-03-05 13:41:24,131] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:41:26,179] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:41:39,194] - [ InnvicutsScraper ] - INFO - [+] Created cache for the products!
+[2021-03-05 13:41:39,195] - [ InnvicutsScraper ] - INFO - [+] Invictus New Prod Monitor Checking for new prods
+[2021-03-05 13:41:43,940] - [ LiverpoolMonitor ] - INFO - [+] Got 119 prod links!
+[2021-03-05 13:41:43,979] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:41:45,930] - [ TafKeywordMon ] - INFO - [+] Got 1 prod links
+[2021-03-05 13:41:48,798] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:41:56,453] - [ TafNewProducts ] - INFO - [+] Got 12 prod links
+[2021-03-05 13:42:04,041] - [ LiverpoolMonitor ] - INFO - [+] Got 119 prod links!
+[2021-03-05 13:42:04,070] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:42:10,798] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:42:21,676] - [ TafKeywordMon ] - INFO - [+] Got 1 prod links
+[2021-03-05 13:42:26,595] - [ LiverpoolMonitor ] - INFO - [+] Got 119 prod links!
+[2021-03-05 13:42:26,633] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:42:34,173] - [ InvictusRestockMonitor ] - INFO - [+] Invictus Restock Checking for restock
+[2021-03-05 13:42:35,706] - [ TafNewProducts ] - INFO - [+] Got 12 prod links
+[2021-03-05 13:42:48,597] - [ LiverpoolMonitor ] - INFO - [+] Got 119 prod links!
+[2021-03-05 13:42:48,625] - [ LiverpoolMonitor ] - INFO - [+] Getting all the prod links ...
+[2021-03-05 13:42:57,525] - [discord.client] - INFO - Cleaning up tasks.
+[2021-03-05 13:42:57,525] - [discord.client] - INFO - Cleaning up after 2 tasks.
+[2021-03-05 13:42:57,584] - [discord.client] - INFO - All tasks finished cancelling.
+[2021-03-05 13:42:57,585] - [discord.client] - INFO - Closing the event loop.
+[+] We have logged in as Virchual's Bot#2319
+[+] Loading extensions ...
+[+] Innvictus Commands has been loaded!

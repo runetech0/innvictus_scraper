@@ -31,7 +31,6 @@ class TafNewProdsScraper:
     def start(self):
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
-        # asyncio.run(self.main())
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.main())
 
@@ -40,6 +39,7 @@ class TafNewProdsScraper:
         await self.create_cache()
         while True:
             links = await self.get_all_prods_links()
+            self.log(f'[+] Got {len(links)} prod links')
             for link in links:
                 if not self.cache.in_cache(link):
                     prod_details = await self.get_prod_details(link)
@@ -127,6 +127,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
                     continue
                 self.URL = target_link
                 prod_links = await self.get_all_prods_links()
+                self.log(f'[+] Got {len(prod_links)} prod links')
                 for link in prod_links:
                     if not self.cache.in_cache(link):
                         prod_details = await self.get_prod_details(link)
