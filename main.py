@@ -60,7 +60,7 @@ mon = LiverPoolNewProdsScraper(products_queue)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
-keywords = ['Nike dunk']
+keywords = ['Nike dunk', 'jordan lo', 'jordan mi']
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)

@@ -47,3 +47,11 @@ class LiverPoolProduct:
         self.in_stock_sizes = []
         self.out_of_stock_sizes = []
         self.color = None
+
+
+class AliveMexProduct:
+    def __init__(self):
+        self.name = None
+        self.link = None
+        self.img_link = None
+        self.price = None
