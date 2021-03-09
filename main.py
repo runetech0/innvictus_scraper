@@ -4,6 +4,7 @@ import queue
 from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor, start_new_prod_mon
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
 from scrapers.liverpool import LiverPoolNewProdsScraper
+from scrapers.alivemex import AliveMexNewProdScraper
 from extensions.sender import Sender
 from Cogs.bot import start_bot
 import logging
@@ -64,3 +65,7 @@ keywords = ['Nike dunk', 'jordan lo', 'jordan mi']
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
+
+mon = AliveMexNewProdScraper(products_queue)
+mon = TafKeywordMonitor(products_queue, keywords)
+mp.Process(target=mon.start).start()

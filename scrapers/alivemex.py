@@ -39,13 +39,17 @@ class AliveMexNewProdScraper:
         self.log('[+] AliveMex Scraper is up!')
         await self.create_cache()
         while True:
-            prod_links = await self.get_all_prod_links()
-            self.log(f'[+] Got {len(prod_links)} prod links')
-            for link in prod_links:
-                if not self.cache.in_cache(link):
-                    prod_details = await self.get_prod_details(link)
-                    self.queue.put(prod_details)
-            await asyncio.sleep(self.itter_time)
+            try:
+                prod_links = await self.get_all_prod_links()
+                self.log(f'[+] Got {len(prod_links)} prod links')
+                for link in prod_links:
+                    if not self.cache.in_cache(link):
+                        prod_details = await self.get_prod_details(link)
+                        self.queue.put(prod_details)
+                await asyncio.sleep(self.itter_time)
+            except Exception as e:
+                self.log(e)
+                await asyncio.sleep(self.itter_time)
 
     async def create_cache(self):
         self.log('[+] Creating cache for the prod links')

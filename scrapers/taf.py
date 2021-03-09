@@ -41,14 +41,18 @@ class TafNewProdsScraper:
         self.log('[+] Taf New Prods Scraper is up!')
         await self.create_cache()
         while True:
-            links = await self.get_all_prods_links()
-            self.log(f'[+] Got {len(links)} prod links')
-            for link in links:
-                if not self.cache.in_cache(link):
-                    prod_details = await self.get_prod_details(link)
-                    self.queue.put(prod_details)
-            self.cache.replace_cache(links)
-            await asyncio.sleep(self.itter_time)
+            try:
+                links = await self.get_all_prods_links()
+                self.log(f'[+] Got {len(links)} prod links')
+                for link in links:
+                    if not self.cache.in_cache(link):
+                        prod_details = await self.get_prod_details(link)
+                        self.queue.put(prod_details)
+                self.cache.replace_cache(links)
+                await asyncio.sleep(self.itter_time)
+            except Exception as e:
+                self.log(e)
+                await asyncio.sleep(self.itter_time)
 
     async def create_cache(self):
         self.log('[+] Creating cache ..')
@@ -126,23 +130,27 @@ class TafKeywordMonitor(TafNewProdsScraper):
     async def main(self):
         self.log(f'[+] Started Taf keyword monitor')
         while True:
-            for keyword in self.keywords:
-                temp_cache = []
-                target_link = f'{self.base_URL}/{keyword}'
-                if not await self.has_prods(target_link):
-                    await asyncio.sleep(3)
-                    continue
-                self.URL = target_link
-                prod_links = await self.get_all_prods_links()
-                self.log(f'[+] Got {len(prod_links)} prod links')
-                for link in prod_links:
-                    if not self.cache.in_cache(link):
-                        prod_details = await self.get_prod_details(link)
-                        self.queue.put(prod_details)
-                        self.cache.add_cache(link)
-                temp_cache.extend(prod_links)
-            self.cache.replace_cache(temp_cache)
-            await asyncio.sleep(self.itter_time)
+            try:
+                for keyword in self.keywords:
+                    temp_cache = []
+                    target_link = f'{self.base_URL}/{keyword}'
+                    if not await self.has_prods(target_link):
+                        await asyncio.sleep(3)
+                        continue
+                    self.URL = target_link
+                    prod_links = await self.get_all_prods_links()
+                    self.log(f'[+] Got {len(prod_links)} prod links')
+                    for link in prod_links:
+                        if not self.cache.in_cache(link):
+                            prod_details = await self.get_prod_details(link)
+                            self.queue.put(prod_details)
+                            self.cache.add_cache(link)
+                    temp_cache.extend(prod_links)
+                self.cache.replace_cache(temp_cache)
+                await asyncio.sleep(self.itter_time)
+            except Exception as e:
+                self.log(e)
+                await asyncio.sleep(self.itter_time)
 
     async def has_prods(self, link):
         await self.start_driver()
