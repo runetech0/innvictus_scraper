@@ -39,6 +39,7 @@ class AliveMexNewProdScraper:
         self.log('[+] AliveMex Scraper is up!')
         await self.create_cache()
         while True:
+            self.log('[+] Checking for new prods')
             try:
                 prod_links = await self.get_all_prod_links()
                 self.log(f'[+] Got {len(prod_links)} prod links')
