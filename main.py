@@ -1,7 +1,7 @@
 import json
 import multiprocessing as mp
 import queue
-from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor, start_new_prod_mon
+from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
 from scrapers.liverpool import LiverPoolNewProdsScraper
 from scrapers.alivemex import AliveMexNewProdScraper
