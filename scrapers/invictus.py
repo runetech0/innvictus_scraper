@@ -40,8 +40,6 @@ class InvictusNewProductsScraper:
 
     def start(self):
         self.loop.run_until_complete(self.main())
-        # test_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
-        # self.loop.run_until_complete(self.get_prod_details(test_link))
 
     async def main(self):
         display = Display(visible=0, size=(1920, 1080))
@@ -115,7 +113,6 @@ class InvictusNewProductsScraper:
         self.driver.get(link)
 
     async def get_prod_details(self, link):
-        # self.log(f'Getting the product details {link}')
         while True:
             try:
                 await self.load_prod_page(link)
@@ -168,10 +165,6 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
 
     def start(self):
         self.loop.run_until_complete(self.main())
-        # asyncio.run(self.main())
-        # na_product_link = 'https://www.innvictus.com/mujeres/casual/tenis/nike/tenis-nike-dunk-low-coast/p/000000000000186482'
-        # available_link = 'https://www.innvictus.com/mujeres/casual/tenis/adidas/tenis-adidas-nmdr1/p/000000000000181525'
-        # self.loop.run_until_complete(self.get_prod_details(available_link))
 
     async def main(self):
         self.db = DB()
@@ -183,7 +176,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             try:
                 restock_list = await self.db.get_inn_rs_list()
                 # restock_list = [
-                #     'https://www.innvictus.com/unisex/casual/tenis/puma/tenis-puma-mirage-tech-x-helly-hansen/p/000000000000209819'
+                #     'https://www.innvictus.com/hombres/acu%c3%a1ticos/tenis/champion/sandalias-champion-ipo-select/p/000000000000209885'
                 # ]
                 if len(restock_list) == 0:
                     await asyncio.sleep(30)
@@ -200,18 +193,25 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
+        target_id = 'js-stock-notification-container'
         try:
+            in_stock = WebDriverWait(self.driver, 15).until(
+                EC.presence_of_element_located(
+                    (By.ID, target_id))
+            )
             in_stock = self.driver.find_element_by_id(
-                'js-stock-notification-container')
+                target_id)
+            classes = in_stock.get_attribute('class')
+            self.driver.quit()
+            if 'hidden' in classes:
+                return True
+            else:
+                return False
         except exceptions.NoSuchElementException:
             try:
                 self.driver.find_elements_by_class_name('product-slider')
                 return True
             except exceptions.NoSuchElementException:
                 return False
-        classes = in_stock.get_attribute('class')
-        self.driver.quit()
-        if 'hidden' in classes:
-            return True
-        else:
+        except exceptions.TimeoutException:
             return False
