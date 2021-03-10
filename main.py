@@ -66,6 +66,12 @@ mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
+keywords = ['Nike dun', 'jordan hi', 'jordan', 'dun',  'yeezy']
+mon = TafKeywordMonitor(products_queue, keywords)
+mp.Process(target=mon.start).start()
+time.sleep(psd)
+
+
 mon = AliveMexNewProdScraper(products_queue)
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
