@@ -44,9 +44,10 @@ class AliveMexNewProdScraper:
                 prod_links = await self.get_all_prod_links()
                 self.log(f'[+] Got {len(prod_links)} prod links')
                 for link in prod_links:
-                    if not self.cache.in_cache(link):
+                    if not self.cache.has_item(link):
                         prod_details = await self.get_prod_details(link)
                         self.queue.put(prod_details)
+                        self.cache.add_item(link)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)

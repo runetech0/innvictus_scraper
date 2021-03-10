@@ -45,10 +45,10 @@ class TafNewProdsScraper:
                 links = await self.get_all_prods_links()
                 self.log(f'[+] Got {len(links)} prod links')
                 for link in links:
-                    if not self.cache.in_cache(link):
+                    if not self.cache.has_item(link):
                         prod_details = await self.get_prod_details(link)
                         self.queue.put(prod_details)
-                self.cache.replace_cache(links)
+                        self.cache.add_item(link)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
@@ -141,10 +141,10 @@ class TafKeywordMonitor(TafNewProdsScraper):
                     prod_links = await self.get_all_prods_links()
                     self.log(f'[+] Got {len(prod_links)} prod links')
                     for link in prod_links:
-                        if not self.cache.in_cache(link):
+                        if not self.cache.has_item(link):
                             prod_details = await self.get_prod_details(link)
                             self.queue.put(prod_details)
-                            self.cache.add_cache(link)
+                            self.cache.add_item(link)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
@@ -160,7 +160,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
             self.URL = target_link
             prod_links = await self.get_all_prods_links()
             for link in prod_links:
-                self.cache.add_cache(link)
+                self.cache.add_item(link)
         self.log('[+] Cache created!')
 
     async def has_prods(self, link):

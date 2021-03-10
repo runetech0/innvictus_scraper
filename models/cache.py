@@ -1,93 +1,72 @@
-import os
-import shelve
-import enum
-
-
-class DictCache:
-    def __init__(self, cache_name):
-        self.db_dir = './Cache'
-        if not os.path.exists(self.db_dir):
-            os.mkdir(self.db_dir)
-        self.db = self.db_dir + f'/cache_{cache_name}'
-
-    def cache_key_exists(self, key):
-        with shelve.open(self.db) as f:
-            if key in f.keys():
-                return True
-            return False
-
-    def cache_exists(self, value):
-        with shelve.open(self.db) as f:
-            if value in f.values():
-                return True
-            return False
-
-    def get_cache(self, key):
-        with shelve.open(self.db) as f:
-            return f.get(key, default=None)
-
-    def cache_keys(self):
-        with shelve.open(self.db) as f:
-            return list(f.keys())
-
-    def cache_values(self):
-        with shelve.open(self.db) as f:
-            return list(f.values())
-
-    def add_cache(self, key, value):
-        with shelve.open(self.db) as f:
-            f[key] = value
-
-    def remove_cache(self, key):
-        with shelve.open(self.db) as f:
-            f.pop(key, None)
-
-    def replace_cache(self, new_cache: dict):
-        with shelve.open(self.db) as f:
-            for k in f.keys():
-                f.pop(k, None)
-            f.update(new_cache)
-
-    def update_cache(self, update):
-        with shelve.open(self.db) as f:
-            f.update(update)
+from pymongo import MongoClient
 
 
 class ListCache:
-    def __init__(self, cache_name, cache_size=200,
-                 control_size=False):
-        self.db_dir = './Cache'
-        if not os.path.exists(self.db_dir):
-            os.mkdir(self.db_dir)
-        self.db = self.db_dir + f'/cache_{cache_name}'
-        self.cache_name = cache_name
-        self.cache_size = cache_size
-        self.control_size = control_size
-        if not os.path.exists(self.db):
-            with shelve.open(self.db) as f:
-                f[self.cache_name] = []
+    def __init__(self, cache_name):
+        self.cache_name = cache_name.replace(' ', '')
+        self._client = MongoClient()
+        self._db = self._client.cache_db
+        self.cache = self._db.cache_col
+        self._doc_id = cache_name
+        self._cache_id = '_cache_id'
+        self.list_key = 'CacheList'
 
-    def in_cache(self, item):
-        with shelve.open(self.db) as f:
-            if item in f.get(self.cache_name):
-                return True
-            return False
+    def _create_if_not(self):
+        doc = self.cache.find_one({self._doc_id: self._doc_id})
+        if not doc:
+            self.cache.insert_one({
+                self.list_key: [],
+                self._cache_id: self._cache_id
+            })
 
-    def add_cache(self, item):
-        with shelve.open(self.db) as f:
-            f.get(self.cache_name).append(item)
-            self.vaildate_size()
+    def add_item(self, new_item):
+        self._create_if_not()
+        self.cache.find_one_and_update({
+            self._cache_id: self._cache_id
+        }, {
+            '$push': {self.list_key: new_item}
+        })
 
-    def remove_cache(self, item):
-        with shelve.open(self.db) as f:
-            f.get(self.cache_name).remove(item)
+    def has_item(self, item):
+        self._create_if_not()
+        res = self.cache.find_one({self._cache_id: self._cache_id})
+        return item in list(res[self.list_key])
 
-    def replace_cache(self, new_cache: list):
-        with shelve.open(self.db) as f:
-            f[self.cache_name] = new_cache
-            self.vaildate_size()
+    def remove_item(self, item):
+        self._create_if_not()
+        self.cache.find_one_and_update({
+            self._cache_id: self._cache_id
+        }, {
+            '$pull': {self.list_key: item}
+        })
 
-    def vaildate_size(self):
-        if self.control_size:
-            with shelve.open(self.db) as f:
-                f[self.cache_name] = f[self.cache_name][-self.cache_size:]
+    def get_all_items(self):
+        self._create_if_not()
+        res = self.cache.find_one({self._cache_id: self._cache_id})
+        return res[self.list_key]
+
+    def invalidate_cache(self):
+        self.cache.update_one({
+            self._cache_id: self._cache_id
+        }, {
+            '$set': {
+                self.list_key: [],
+            }
+        })
+
+    def replace_cache(self, new_cache):
+        self._create_if_not()
+        self.cache.update_one({
+            self._cache_id: self._cache_id
+        }, {
+            '$set': {
+                self.list_key: new_cache,
+            }
+        })
+
+
+if __name__ == '__main__':
+    cache = ListCache('cache')
+    link = 'https://www.innvictus.com/p/0000000000000188152'
+    cache.add_item(link)
+    print(cache.has_item(link))

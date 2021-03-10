@@ -39,14 +39,17 @@ class LiverPoolNewProdsScraper:
     async def main(self):
         await self.create_cache()
         while True:
-            all_links = await self.get_all_prod_links()
-            self.log(f'[+] Got {len(all_links)} prod links!')
-            for link in all_links:
-                if not self.cache.in_cache(link):
-                    prod = await self.get_prod_details(link)
-                    self.queue.put(prod)
-                    self.cache.add_cache(link)
-            await asyncio.sleep(self.itter_time)
+            try:
+                all_links = await self.get_all_prod_links()
+                self.log(f'[+] Got {len(all_links)} prod links!')
+                for link in all_links:
+                    if not self.cache.has_item(link):
+                        prod = await self.get_prod_details(link)
+                        self.queue.put(prod)
+                        self.cache.add_item(link)
+                await asyncio.sleep(self.itter_time)
+            except Exception as e:
+                self.log(e)
 
     async def create_cache(self):
         self.log('[+] Creating cache ..')

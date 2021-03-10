@@ -20,6 +20,10 @@ import multiprocessing
 class InvictusNewProductsScraper:
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
+        self.keywords_config = json.load(open(
+            global_vars.FILTRATION_KEYWORDS_FILE_LOCATION))
+        self.fitration_keywords = list(self.keywords_config.get(
+            "INNVICTUS_KEYWORDS"))
         self.queue = queue
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
@@ -53,14 +57,17 @@ class InvictusNewProductsScraper:
                     await asyncio.sleep(3)
                     continue
                 for link in all_prods:
-                    if not self.cache.in_cache(link):
+                    if not self.cache.has_item(link):
                         prod = await self.get_prod_details(link)
-                        self.queue.put(prod)
-                        self.cache.add_cache(link)
+                        self.cache.add_item(link)
+                        for keyword in self.fitration_keywords:
+                            if keyword in prod.prod_name.lower():
+                                self.queue.put(prod)
+                                break
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
-                print('Blind exception in invictus new prod')
-                print(e)
+                self.log('Blind exception in invictus new prod')
+                self.log(e)
 
     async def create_cache(self):
         self.log('[+] Creating cache for the products ..')
@@ -104,6 +111,7 @@ class InvictusNewProductsScraper:
         self.driver = get_chromedriver(
             chrome_options=self.options, use_proxy=True,
             executable_path=self.webdriver_path)
+        self.driver.implicitly_wait(10)
         self.driver.get(link)
 
     async def get_prod_details(self, link):
@@ -174,6 +182,9 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             self.log('[+] Invictus Restock Checking for restock')
             try:
                 restock_list = await self.db.get_inn_rs_list()
+                # restock_list = [
+                #     'https://www.innvictus.com/unisex/casual/tenis/puma/tenis-puma-mirage-tech-x-helly-hansen/p/000000000000209819'
+                # ]
                 if len(restock_list) == 0:
                     await asyncio.sleep(30)
                 for link in restock_list:
@@ -184,8 +195,8 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
                         await self.db.remove_inn_rs_list(link)
                         await asyncio.sleep(1)
             except Exception as e:
-                print('Blind exception in invictus restock')
-                print(e)
+                self.log('Blind exception in invictus restock')
+                self.log(e)
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
@@ -193,20 +204,14 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             in_stock = self.driver.find_element_by_id(
                 'js-stock-notification-container')
         except exceptions.NoSuchElementException:
-            return False
+            try:
+                self.driver.find_elements_by_class_name('product-slider')
+                return True
+            except exceptions.NoSuchElementException:
+                return False
         classes = in_stock.get_attribute('class')
         self.driver.quit()
         if 'hidden' in classes:
             return True
         else:
             return False
-
-
-if __name__ == '__main__':
-    mon = InvictusNewProductsScraper(Queue())
-    mon.start()
-
-
-def start_new_prod_mon(queue):
-    mon = InvictusNewProductsScraper(queue)
-    mon.start()
