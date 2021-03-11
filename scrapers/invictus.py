@@ -182,6 +182,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
                 #     'https://www.innvictus.com/hombres/acu%c3%a1ticos/tenis/champion/sandalias-champion-ipo-select/p/000000000000209885'
                 # ]
                 if len(restock_list) == 0:
+                    self.log('[+] No prods links to monitor ')
                     await asyncio.sleep(30)
                 for link in restock_list:
                     if await self.prod_in_stock(link):
