@@ -11,7 +11,6 @@ class LiverPoolNewProdsScraper:
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
-        self.cache = ListCache('LiverPoolCache')
         self.log = logging.getLogger(' LiverpoolMonitor ').info
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')
@@ -29,6 +28,7 @@ class LiverPoolNewProdsScraper:
         self.itter_time = 120
 
     def start(self):
+        self.cache = ListCache('LiverPoolCache')
         self.loop.run_until_complete(self.main())
 
     async def start_driver(self):

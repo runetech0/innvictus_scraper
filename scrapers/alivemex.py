@@ -14,7 +14,6 @@ class AliveMexNewProdScraper:
     def __init__(self, queue):
         self.config = json.load(open(MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
-        self.cache = ListCache('AliveMexNewProdScraper')
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')
         self.options.add_argument('--headless')
@@ -28,6 +27,7 @@ class AliveMexNewProdScraper:
         self.itter_time = 120
 
     def start(self):
+        self.cache = ListCache('AliveMexNewProdScraper')
         self.loop.run_until_complete(self.main())
 
     async def start_driver(self):
@@ -51,7 +51,7 @@ class AliveMexNewProdScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                await asyncio.sleep(self.itter_time)
+                await asyncio.sleep(3)
 
     async def create_cache(self):
         self.log('[+] Creating cache for the prod links')

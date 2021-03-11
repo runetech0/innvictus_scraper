@@ -73,5 +73,4 @@ time.sleep(psd)
 
 
 mon = AliveMexNewProdScraper(products_queue)
-mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()

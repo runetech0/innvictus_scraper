@@ -16,7 +16,6 @@ class TafNewProdsScraper:
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
-        self.cache = ListCache('TafNewScraper')
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')
         self.options.add_argument('--headless')
@@ -29,6 +28,7 @@ class TafNewProdsScraper:
         self.itter_time = 120
 
     def start(self):
+        self.cache = ListCache('TafNewScraper')
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.main())
 
@@ -52,7 +52,7 @@ class TafNewProdsScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                await asyncio.sleep(self.itter_time)
+                await asyncio.sleep(3)
 
     async def create_cache(self):
         self.log('[+] Creating cache ..')
@@ -125,9 +125,9 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.base_URL = f'https://www.taf.com.mx'
         self.log = logging.getLogger(' TafKeywordMon ').info
         self.itter_time = 120
-        self.cache = ListCache(f'TafKeyWordsMonitor')
 
     async def main(self):
+        self.cache = ListCache(f'TafKeyWordsMonitor')
         self.log(f'[+] Started Taf keyword monitor')
         await self.create_cache()
         while True:
@@ -148,7 +148,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                await asyncio.sleep(self.itter_time)
+                await asyncio.sleep(3)
 
     async def create_cache(self):
         self.log('[+] Creating cache...')

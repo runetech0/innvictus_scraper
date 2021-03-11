@@ -28,9 +28,8 @@ class InvictusNewProductsScraper:
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
-        self.log = logging.getLogger(' InnvicutsScraper ').info
-        self.cache = ListCache('InvictusScraper')
-        self.itter_time = 200
+        self.log = logging.getLogger(' InnvicutsNewProdMon ').info
+        self.itter_time = 120
         self.target_links = [
             'https://www.innvictus.com/mujeres/c/mujeres',
             'https://www.innvictus.com/jordan/c/jordan',
@@ -39,6 +38,7 @@ class InvictusNewProductsScraper:
         ]
 
     def start(self):
+        self.cache = ListCache('InvictusScraper')
         self.loop.run_until_complete(self.main())
 
     async def main(self):
@@ -66,6 +66,7 @@ class InvictusNewProductsScraper:
             except Exception as e:
                 self.log('Blind exception in invictus new prod')
                 self.log(e)
+                await asyncio.sleep(3)
 
     async def create_cache(self):
         self.log('[+] Creating cache for the products ..')
@@ -119,6 +120,7 @@ class InvictusNewProductsScraper:
                 break
             except Exception as e:
                 self.log('[-] Failed to load driver')
+                self.log(e)
                 continue
         try:
             WebDriverWait(self.driver, 60).until(
@@ -161,10 +163,11 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
     def __init__(self, queue):
         super().__init__(queue)
         self.log = logging.getLogger(' InvictusRestockMonitor ').info
-        self.cache = ListCache('InvictusRestockMonList')
 
     def start(self):
+        self.cache = ListCache('InvictusRestockMonList')
         self.loop.run_until_complete(self.main())
+        self.itter_time = 10
 
     async def main(self):
         self.db = DB()
@@ -187,6 +190,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
                         self.queue.put(prod)
                         await self.db.remove_inn_rs_list(link)
                         await asyncio.sleep(1)
+                await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log('Blind exception in invictus restock')
                 self.log(e)
