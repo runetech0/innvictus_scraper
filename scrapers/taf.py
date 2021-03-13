@@ -123,7 +123,6 @@ class TafNewProdsScraper:
         if hasattr(self, 'driver'):
             if self.driver is not None:
                 self.driver.quit()
-                del self.driver
                 self.driver = None
 
 
