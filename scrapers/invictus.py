@@ -25,6 +25,7 @@ class InvictusNewProductsScraper:
         self.fitration_keywords = list(self.keywords_config.get(
             "INNVICTUS_KEYWORDS"))
         self.queue = queue
+        self.driver = None
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
@@ -156,10 +157,9 @@ class InvictusNewProductsScraper:
         return prod
 
     def quit_browser(self):
-        if hasattr(self, 'driver'):
-            if self.driver is not None:
-                self.driver.quit()
-                self.driver = None
+        if self.driver is not None:
+            self.driver.quit()
+            self.driver = None
 
 
 class InvictusRestockMonitor(InvictusNewProductsScraper):

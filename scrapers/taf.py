@@ -23,6 +23,7 @@ class TafNewProdsScraper:
         self.options.add_argument('start-maximized')
         self.options.add_argument('disable-infobars')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
+        self.driver = None
         self.URL = 'https://www.taf.com.mx/jordan'
         self.log = logging.getLogger(' TafNewProducts ').info
         self.itter_time = 120
@@ -117,10 +118,9 @@ class TafNewProdsScraper:
         return p
 
     def quit_browser(self):
-        if hasattr(self, 'driver'):
-            if self.driver is not None:
-                self.driver.quit()
-                self.driver = None
+        if self.driver is not None:
+            self.driver.quit()
+            self.driver = None
 
 
 class TafKeywordMonitor(TafNewProdsScraper):

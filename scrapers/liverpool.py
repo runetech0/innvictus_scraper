@@ -20,6 +20,7 @@ class LiverPoolNewProdsScraper:
         self.options.add_argument('disable-infobars')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
+        self.driver = None
         self.URLs = [
             'https://www.liverpool.com.mx/tienda/zapatos/catst1105210',
             'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
@@ -97,7 +98,6 @@ class LiverPoolNewProdsScraper:
         return prod
 
     def quit_browser(self):
-        if hasattr(self, 'driver'):
-            if self.driver is not None:
-                self.driver.quit()
-                self.driver = None
+        if self.driver is not None:
+            self.driver.quit()
+            self.driver = None

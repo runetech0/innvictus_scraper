@@ -25,6 +25,7 @@ class AliveMexNewProdScraper:
         self.URL = 'https://www.alivemexico.com/'
         self.log = logging.getLogger('AliveMex').info
         self.itter_time = 120
+        self.driver = None
 
     def start(self):
         self.cache = ListCache('AliveMexNewProdScraper')
@@ -97,7 +98,6 @@ class AliveMexNewProdScraper:
         return details
 
     def quit_browser(self):
-        if hasattr(self, 'driver'):
-            if self.driver is not None:
-                self.driver.quit()
-                self.driver = None
+        if self.driver is not None:
+            self.driver.quit()
+            self.driver = None
