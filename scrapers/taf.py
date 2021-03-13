@@ -120,10 +120,11 @@ class TafNewProdsScraper:
         return p
 
     def quit_browser(self):
-        if self.driver is not None:
-            self.driver.quit()
-            del self.driver
-            self.driver = None
+        if hasattr(self, 'driver'):
+            if self.driver is not None:
+                self.driver.quit()
+                del self.driver
+                self.driver = None
 
 
 class TafKeywordMonitor(TafNewProdsScraper):

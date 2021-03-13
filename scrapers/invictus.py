@@ -162,10 +162,11 @@ class InvictusNewProductsScraper:
         return prod
 
     def quit_browser(self):
-        if self.driver is not None:
-            self.driver.quit()
-            del self.driver
-            self.driver = None
+        if hasattr(self, 'driver'):
+            if self.driver is not None:
+                self.driver.quit()
+                del self.driver
+                self.driver = None
 
 
 class InvictusRestockMonitor(InvictusNewProductsScraper):
@@ -185,20 +186,20 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         while True:
             self.log('[+] Invictus Restock Checking for restock')
             try:
-                # restock_list = await self.db.get_inn_rs_list()
-                restock_list = [
-                    'https://www.innvictus.com/p/000000000000188096',
-                    'https://www.innvictus.com/p/000000000000212289'
-                ]
+                restock_list = await self.db.get_inn_rs_list()
+                # restock_list = [
+                #     'https://www.innvictus.com/p/000000000000188096',
+                #     'https://www.innvictus.com/p/000000000000212289'
+                # ]
                 if len(restock_list) == 0:
                     self.log('[+] No prods links to monitor ')
                     await asyncio.sleep(30)
                 for link in restock_list:
                     if await self.prod_in_stock(link):
                         self.log(f'[+] Got restock : {link}')
-                        # prod = await self.get_prod_details(link)
-                        # self.queue.put(prod)
-                        # await self.db.remove_inn_rs_list(link)
+                        prod = await self.get_prod_details(link)
+                        self.queue.put(prod)
+                        await self.db.remove_inn_rs_list(link)
                         await asyncio.sleep(1)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
