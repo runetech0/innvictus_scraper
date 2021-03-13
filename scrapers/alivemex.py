@@ -31,6 +31,7 @@ class AliveMexNewProdScraper:
         self.loop.run_until_complete(self.main())
 
     async def start_driver(self):
+        self.quit_browser()
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
@@ -51,6 +52,7 @@ class AliveMexNewProdScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
+                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -79,7 +81,7 @@ class AliveMexNewProdScraper:
                 'a').get_attribute('href')
             prod_links.append(prod_link)
 
-        self.driver.quit()
+        self.quit_browser()
         return prod_links
 
     async def get_prod_details(self, link):
@@ -94,5 +96,11 @@ class AliveMexNewProdScraper:
         details.price = self.driver.find_element_by_class_name(
             'current-price').text.replace('$', '').replace(',', '')
 
-        self.driver.quit()
+        self.quit_browser()
         return details
+
+    def quit_browser(self):
+        if self.driver is not None:
+            self.driver.quit()
+            del self.driver
+            self.driver = None

@@ -33,6 +33,7 @@ class TafNewProdsScraper:
         self.loop.run_until_complete(self.main())
 
     async def start_driver(self):
+        self.quit_browser()
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
@@ -52,6 +53,7 @@ class TafNewProdsScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
+                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -76,7 +78,7 @@ class TafNewProdsScraper:
             prod_link = prod.find_element_by_tag_name(
                 'a').get_attribute('href')
             links.append(prod_link)
-        self.driver.quit()
+        self.quit_browser()
         return links
 
     async def get_prod_details(self, link):
@@ -114,8 +116,14 @@ class TafNewProdsScraper:
             size.atc = self.driver.find_element_by_class_name(
                 'buy-in-page-button').get_attribute('href').replace('redirect=false', 'redirect=true')
             p.in_stock_sizes.append(size)
-        self.driver.quit()
+        self.quit_browser()
         return p
+
+    def quit_browser(self):
+        if self.driver is not None:
+            self.driver.quit()
+            del self.driver
+            self.driver = None
 
 
 class TafKeywordMonitor(TafNewProdsScraper):
@@ -148,6 +156,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
+                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -168,8 +177,8 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.driver.get(link)
         try:
             self.driver.find_element_by_class_name('head-tittle')
-            self.driver.quit()
+            self.quit_browser()
             return False
         except exceptions.NoSuchElementException:
-            self.driver.quit()
+            self.quit_browser()
             return True

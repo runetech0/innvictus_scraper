@@ -66,6 +66,7 @@ class InvictusNewProductsScraper:
             except Exception as e:
                 self.log('Blind exception in invictus new prod')
                 self.log(e)
+                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -90,9 +91,9 @@ class InvictusNewProductsScraper:
                     )
                     break
                 except Exception as e:
+                    self.quit_browser()
                     tries += 1
                     if tries >= 5:
-                        self.driver.quit()
                         raise e
                     self.log(
                         f'[-] Could not load page in try {tries} : {link}')
@@ -103,10 +104,11 @@ class InvictusNewProductsScraper:
                 prod_link = prod.find_element_by_class_name(
                     'js-gtm-product-click').get_attribute('href')
                 to_return.append(prod_link)
-            self.driver.quit()
+            self.quit_browser()
         return to_return
 
     async def load_prod_page(self, link):
+        self.quit_browser()
         self.driver = get_chromedriver(
             chrome_options=self.options, use_proxy=True,
             executable_path=self.webdriver_path)
@@ -121,6 +123,7 @@ class InvictusNewProductsScraper:
             except Exception as e:
                 self.log('[-] Failed to load driver')
                 self.log(e)
+                self.quit_browser()
                 continue
         try:
             WebDriverWait(self.driver, 60).until(
@@ -129,7 +132,7 @@ class InvictusNewProductsScraper:
             )
         except Exception as e:
             self.log(e)
-            self.driver.quit()
+            self.quit_browser()
             return await self.get_prod_details(link)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         prod = InvictusProduct()
@@ -155,8 +158,14 @@ class InvictusNewProductsScraper:
                 prod.out_of_stock_sizes.append(size_number)
                 continue
             prod.in_stock_sizes.append(size_number)
-        self.driver.quit()
+        self.quit_browser()
         return prod
+
+    def quit_browser(self):
+        if self.driver is not None:
+            self.driver.quit()
+            del self.driver
+            self.driver = None
 
 
 class InvictusRestockMonitor(InvictusNewProductsScraper):
@@ -165,7 +174,6 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         self.log = logging.getLogger(' InvictusRestockMonitor ').info
 
     def start(self):
-        self.cache = ListCache('InvictusRestockMonList')
         self.loop.run_until_complete(self.main())
         self.itter_time = 10
 
@@ -177,24 +185,26 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         while True:
             self.log('[+] Invictus Restock Checking for restock')
             try:
-                restock_list = await self.db.get_inn_rs_list()
-                # restock_list = [
-                #     'https://www.innvictus.com/hombres/acu%c3%a1ticos/tenis/champion/sandalias-champion-ipo-select/p/000000000000209885'
-                # ]
+                # restock_list = await self.db.get_inn_rs_list()
+                restock_list = [
+                    'https://www.innvictus.com/p/000000000000188096',
+                    'https://www.innvictus.com/p/000000000000212289'
+                ]
                 if len(restock_list) == 0:
                     self.log('[+] No prods links to monitor ')
                     await asyncio.sleep(30)
                 for link in restock_list:
                     if await self.prod_in_stock(link):
                         self.log(f'[+] Got restock : {link}')
-                        prod = await self.get_prod_details(link)
-                        self.queue.put(prod)
-                        await self.db.remove_inn_rs_list(link)
+                        # prod = await self.get_prod_details(link)
+                        # self.queue.put(prod)
+                        # await self.db.remove_inn_rs_list(link)
                         await asyncio.sleep(1)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log('Blind exception in invictus restock')
                 self.log(e)
+                self.quit_browser()
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
@@ -207,16 +217,22 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             in_stock = self.driver.find_element_by_id(
                 target_id)
             classes = in_stock.get_attribute('class')
-            self.driver.quit()
+            self.quit_browser()
             if 'hidden' in classes:
                 return True
             else:
+                self.log(f'{link} is out of stock 1')
                 return False
         except exceptions.NoSuchElementException:
             try:
                 self.driver.find_elements_by_class_name('product-slider')
+                self.quit_browser()
                 return True
             except exceptions.NoSuchElementException:
+                self.log(f'{link} is out of stock 2')
+                self.quit_browser()
                 return False
         except exceptions.TimeoutException:
+            self.log(f'{link} is out of stock 3')
+            self.quit_browser()
             return False
