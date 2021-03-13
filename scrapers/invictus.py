@@ -29,7 +29,7 @@ class InvictusNewProductsScraper:
         self.options = webdriver.ChromeOptions()
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
-        print = logging.getLogger(' InnvicutsNewProdMon ').info
+        self.log = logging.getLogger(' InnvicutsNewProdMon ').info
         self.itter_time = 120
         self.target_links = [
             'https://www.innvictus.com/mujeres/c/mujeres',
@@ -45,13 +45,13 @@ class InvictusNewProductsScraper:
     async def main(self):
         display = Display(visible=0, size=(1920, 1080))
         display.start()
-        print('[+] Invictus monitor started!')
+        self.log('[+] Invictus monitor started!')
         # await self.create_cache()
         while True:
-            print('[+] Invictus New Prod Monitor Checking for new prods')
+            self.log('[+] Invictus New Prod Monitor Checking for new prods')
             try:
                 all_prods = await self.get_all_prod_links()
-                print(f'[+] Got {len(all_prods)} products')
+                self.log(f'[+] Got {len(all_prods)} products')
                 if all_prods is None:
                     await asyncio.sleep(3)
                     continue
@@ -65,15 +65,15 @@ class InvictusNewProductsScraper:
                                 break
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
-                print('Blind exception in invictus new prod')
-                print(e)
+                self.log('Blind exception in invictus new prod')
+                self.log(e)
                 await asyncio.sleep(3)
 
     async def create_cache(self):
-        print('[+] Creating cache for the products ..')
+        self.log('[+] Creating cache for the products ..')
         all_prods = await self.get_all_prod_links()
         self.cache.replace_cache(all_prods)
-        print('[+] Created cache for the products!')
+        self.log('[+] Created cache for the products!')
 
     async def get_all_prod_links(self) -> list:
         to_return = []
@@ -91,9 +91,9 @@ class InvictusNewProductsScraper:
                     tries += 1
                     if tries >= 5:
                         raise e
-                    print(
+                    self.log(
                         f'[-] Could not load page in try {tries} : {link}')
-                    print(e)
+                    self.log(e)
 
             prod_list = prods.find_elements_by_class_name('is-pw__product')
             for prod in prod_list:
@@ -116,8 +116,8 @@ class InvictusNewProductsScraper:
                 await self.load_prod_page(link)
                 break
             except Exception as e:
-                print('[-] Failed to load driver')
-                print(e)
+                self.log('[-] Failed to load driver')
+                self.log(e)
                 continue
         try:
             WebDriverWait(self.driver, 60).until(
@@ -125,7 +125,7 @@ class InvictusNewProductsScraper:
                     (By.ID, 'productName'))
             )
         except Exception as e:
-            print(e)
+            self.log(e)
             return await self.get_prod_details(link)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         prod = InvictusProduct()
@@ -162,7 +162,7 @@ class InvictusNewProductsScraper:
 class InvictusRestockMonitor(InvictusNewProductsScraper):
     def __init__(self, queue):
         super().__init__(queue)
-        print = logging.getLogger(' InvictusRestockMonitor ').info
+        self.log = logging.getLogger(' InvictusRestockMonitor ').info
 
     def start(self):
         self.loop.run_until_complete(self.main())
@@ -172,9 +172,9 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         self.db = DB()
         display = Display(visible=0, size=(1920, 1080))
         display.start()
-        print('[+] Restock monitor is ready!')
+        self.log('[+] Restock monitor is ready!')
         while True:
-            print('[+] Invictus Restock Checking for restock')
+            self.log('[+] Invictus Restock Checking for restock')
             try:
                 restock_list = await self.db.get_inn_rs_list()
                 # restock_list = [
@@ -182,19 +182,19 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
                 #     'https://www.innvictus.com/p/000000000000212289'
                 # ]
                 if len(restock_list) == 0:
-                    print('[+] No prods links to monitor ')
+                    self.log('[+] No prods links to monitor ')
                     await asyncio.sleep(30)
                 for link in restock_list:
                     if await self.prod_in_stock(link):
-                        print(f'[+] Got restock : {link}')
+                        self.log(f'[+] Got restock : {link}')
                         prod = await self.get_prod_details(link)
                         self.queue.put(prod)
                         await self.db.remove_inn_rs_list(link)
                         await asyncio.sleep(1)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
-                print('Blind exception in invictus restock')
-                print(e)
+                self.log('Blind exception in invictus restock')
+                self.log(e)
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
@@ -210,15 +210,15 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             if 'hidden' in classes:
                 return True
             else:
-                print(f'{link} is out of stock 1')
+                self.log(f'{link} is out of stock 1')
                 return False
         except exceptions.NoSuchElementException:
             try:
                 self.driver.find_elements_by_class_name('product-slider')
                 return True
             except exceptions.NoSuchElementException:
-                print(f'{link} is out of stock 2')
+                self.log(f'{link} is out of stock 2')
                 return False
         except exceptions.TimeoutException:
-            print(f'{link} is out of stock 3')
+            self.log(f'{link} is out of stock 3')
             return False
