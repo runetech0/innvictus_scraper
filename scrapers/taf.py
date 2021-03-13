@@ -53,7 +53,6 @@ class TafNewProdsScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -78,7 +77,6 @@ class TafNewProdsScraper:
             prod_link = prod.find_element_by_tag_name(
                 'a').get_attribute('href')
             links.append(prod_link)
-        self.quit_browser()
         return links
 
     async def get_prod_details(self, link):
@@ -116,7 +114,6 @@ class TafNewProdsScraper:
             size.atc = self.driver.find_element_by_class_name(
                 'buy-in-page-button').get_attribute('href').replace('redirect=false', 'redirect=true')
             p.in_stock_sizes.append(size)
-        self.quit_browser()
         return p
 
     def quit_browser(self):
@@ -156,7 +153,6 @@ class TafKeywordMonitor(TafNewProdsScraper):
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -177,8 +173,6 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.driver.get(link)
         try:
             self.driver.find_element_by_class_name('head-tittle')
-            self.quit_browser()
             return False
         except exceptions.NoSuchElementException:
-            self.quit_browser()
             return True

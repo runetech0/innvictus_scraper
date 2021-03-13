@@ -66,7 +66,6 @@ class InvictusNewProductsScraper:
             except Exception as e:
                 self.log('Blind exception in invictus new prod')
                 self.log(e)
-                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -91,7 +90,6 @@ class InvictusNewProductsScraper:
                     )
                     break
                 except Exception as e:
-                    self.quit_browser()
                     tries += 1
                     if tries >= 5:
                         raise e
@@ -104,7 +102,6 @@ class InvictusNewProductsScraper:
                 prod_link = prod.find_element_by_class_name(
                     'js-gtm-product-click').get_attribute('href')
                 to_return.append(prod_link)
-            self.quit_browser()
         return to_return
 
     async def load_prod_page(self, link):
@@ -123,7 +120,6 @@ class InvictusNewProductsScraper:
             except Exception as e:
                 self.log('[-] Failed to load driver')
                 self.log(e)
-                self.quit_browser()
                 continue
         try:
             WebDriverWait(self.driver, 60).until(
@@ -132,7 +128,6 @@ class InvictusNewProductsScraper:
             )
         except Exception as e:
             self.log(e)
-            self.quit_browser()
             return await self.get_prod_details(link)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         prod = InvictusProduct()
@@ -158,7 +153,6 @@ class InvictusNewProductsScraper:
                 prod.out_of_stock_sizes.append(size_number)
                 continue
             prod.in_stock_sizes.append(size_number)
-        self.quit_browser()
         return prod
 
     def quit_browser(self):
@@ -204,7 +198,6 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             except Exception as e:
                 self.log('Blind exception in invictus restock')
                 self.log(e)
-                self.quit_browser()
 
     async def prod_in_stock(self, link):
         await self.load_prod_page(link)
@@ -217,7 +210,6 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             in_stock = self.driver.find_element_by_id(
                 target_id)
             classes = in_stock.get_attribute('class')
-            self.quit_browser()
             if 'hidden' in classes:
                 return True
             else:
@@ -226,13 +218,10 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         except exceptions.NoSuchElementException:
             try:
                 self.driver.find_elements_by_class_name('product-slider')
-                self.quit_browser()
                 return True
             except exceptions.NoSuchElementException:
                 self.log(f'{link} is out of stock 2')
-                self.quit_browser()
                 return False
         except exceptions.TimeoutException:
             self.log(f'{link} is out of stock 3')
-            self.quit_browser()
             return False

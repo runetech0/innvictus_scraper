@@ -51,7 +51,6 @@ class LiverPoolNewProdsScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                self.quit_browser()
 
     async def create_cache(self):
         self.log('[+] Creating cache ..')

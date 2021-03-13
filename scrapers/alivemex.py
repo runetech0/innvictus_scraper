@@ -52,7 +52,6 @@ class AliveMexNewProdScraper:
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log(e)
-                self.quit_browser()
                 await asyncio.sleep(3)
 
     async def create_cache(self):
@@ -81,7 +80,6 @@ class AliveMexNewProdScraper:
                 'a').get_attribute('href')
             prod_links.append(prod_link)
 
-        self.quit_browser()
         return prod_links
 
     async def get_prod_details(self, link):
@@ -96,7 +94,6 @@ class AliveMexNewProdScraper:
         details.price = self.driver.find_element_by_class_name(
             'current-price').text.replace('$', '').replace(',', '')
 
-        self.quit_browser()
         return details
 
     def quit_browser(self):
