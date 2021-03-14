@@ -46,7 +46,7 @@ class InvictusNewProductsScraper:
         display = Display(visible=0, size=(1920, 1080))
         display.start()
         self.log('[+] Invictus monitor started!')
-        # await self.create_cache()
+        await self.create_cache()
         while True:
             self.log('[+] Invictus New Prod Monitor Checking for new prods')
             try:
