@@ -13,6 +13,7 @@ from models.products import (
 )
 import logging
 from datetime import datetime as dt
+from datetime import timedelta
 
 
 config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
@@ -44,6 +45,13 @@ async def on_error(error):
     log(error)
 
 
+def get_timestamp():
+    time_format = '%Y-%m-%d %R'
+    t = dt.utcnow() - timedelta(hours=6)
+    time = t.strftime(time_format).split('.')[0]
+    return time
+
+
 async def create_innvictus_embed(prod:  InvictusProduct):
     embed = discord.Embed(color=EMBEDS_COLOR)
     embed.title = prod.prod_name
@@ -58,7 +66,7 @@ async def create_innvictus_embed(prod:  InvictusProduct):
     for size in prod.out_of_stock_sizes:
         desc = f'{desc}\n{size}'
     embed.description = desc
-    footer_text = f'Chefsitos MX | {dt.now().strftime("%Y-%m-%d %R")}'
+    footer_text = f'Chefsitos MX | {get_timestamp()}'
     embed.set_footer(text=footer_text)
     return embed
 
@@ -79,7 +87,7 @@ async def create_taf_embed(prod:  TafProduct):
     for size in prod.out_of_stock_sizes:
         desc = f'{desc}\n{size.size_number}'
     embed.description = desc
-    footer_text = f'Chefsitos MX | {dt.now().strftime("%Y-%m-%d %R")}'
+    footer_text = f'Chefsitos MX | {get_timestamp()}'
     embed.set_footer(text=footer_text)
     return embed
 
@@ -98,7 +106,7 @@ async def create_liverpool_embed(prod: LiverPoolProduct):
     for size in prod.out_of_stock_sizes:
         desc = f'{desc}\n{size}'
     embed.description = desc
-    footer_text = f'Chefsitos MX | {dt.now().strftime("%Y-%m-%d %R")}'
+    footer_text = f'Chefsitos MX | {get_timestamp()}'
     embed.set_footer(text=footer_text)
     return embed
 
@@ -109,7 +117,7 @@ async def create_alivemex_embed(prod: LiverPoolProduct):
     embed.add_field(name='Price', value=f'${prod.price}', inline=False)
     embed.url = prod.link
     embed.set_thumbnail(url=prod.img_link)
-    footer_text = f'Chefsitos MX | {dt.now().strftime("%Y-%m-%d %R")}'
+    footer_text = f'Chefsitos MX | {get_timestamp()}'
     embed.set_footer(text=footer_text)
     return embed
 
