@@ -30,7 +30,7 @@ class InvictusNewProductsScraper:
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.loop = asyncio.new_event_loop()
         self.log = logging.getLogger(' InnvicutsNewProdMon ').info
-        self.itter_time = 120
+        self.itter_time = 10
         self.target_links = [
             'https://www.innvictus.com/mujeres/c/mujeres',
             'https://www.innvictus.com/jordan/c/jordan',
@@ -166,7 +166,7 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
 
     def start(self):
         self.loop.run_until_complete(self.main())
-        self.itter_time = 10
+        self.itter_time = 2
 
     async def main(self):
         self.db = DB()

@@ -26,7 +26,7 @@ class LiverPoolNewProdsScraper:
             'https://www.liverpool.com.mx/tienda/zapatos/catst1010801',
             'https://www.liverpool.com.mx/tienda/zapatos/catst1011086'
         ]
-        self.itter_time = 120
+        self.itter_time = 10
 
     def start(self):
         self.cache = ListCache('LiverPoolCache')

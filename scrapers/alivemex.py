@@ -24,7 +24,7 @@ class AliveMexNewProdScraper:
         self.loop = asyncio.new_event_loop()
         self.URL = 'https://www.alivemexico.com/'
         self.log = logging.getLogger('AliveMex').info
-        self.itter_time = 120
+        self.itter_time = 10
         self.driver = None
 
     def start(self):

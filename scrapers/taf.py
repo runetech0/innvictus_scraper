@@ -26,7 +26,7 @@ class TafNewProdsScraper:
         self.driver = None
         self.URL = 'https://www.taf.com.mx/jordan'
         self.log = logging.getLogger(' TafNewProducts ').info
-        self.itter_time = 120
+        self.itter_time = 10
 
     def start(self):
         self.cache = ListCache('TafNewScraper')
@@ -129,7 +129,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.keywords = keywords
         self.base_URL = f'https://www.taf.com.mx'
         self.log = logging.getLogger(' TafKeywordMon ').info
-        self.itter_time = 120
+        self.itter_time = 10
 
     async def main(self):
         self.cache = ListCache(f'TafKeyWordsMonitor')
