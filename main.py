@@ -55,7 +55,7 @@ helper = RestockHelper(restock_queue)
 mp.Process(target=helper.start).start()
 
 
-for i in range(5):
+for i in range(10):
     mon = InvictusRestockMonitor(products_queue, restock_queue)
     mp.Process(target=mon.start).start()
     await time.sleep(2)
