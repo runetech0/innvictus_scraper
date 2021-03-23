@@ -160,13 +160,14 @@ class InvictusNewProductsScraper:
 
 
 class InvictusRestockMonitor(InvictusNewProductsScraper):
-    def __init__(self, queue):
+    def __init__(self, queue, restock_queue):
         super().__init__(queue)
+        self.restock_queue = restock_queue
         self.log = logging.getLogger(' InvictusRestockMonitor ').info
 
     def start(self):
         self.loop.run_until_complete(self.main())
-        self.itter_time = 2
+        self.itter_time = 1
 
     async def main(self):
         self.db = DB()
@@ -176,21 +177,15 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         while True:
             self.log('[+] Invictus Restock Checking for restock')
             try:
-                restock_list = await self.db.get_inn_rs_list()
-                # restock_list = [
-                #     'https://www.innvictus.com/p/000000000000188096',
-                #     'https://www.innvictus.com/p/000000000000212289'
-                # ]
-                if len(restock_list) == 0:
-                    self.log('[+] No prods links to monitor ')
-                    await asyncio.sleep(30)
-                for link in restock_list:
-                    if await self.prod_in_stock(link):
-                        self.log(f'[+] Got restock : {link}')
-                        prod = await self.get_prod_details(link)
-                        self.queue.put(prod)
-                        await self.db.remove_inn_rs_list(link)
-                        await asyncio.sleep(1)
+                while self.restock_queue.empty():
+                    await asyncio.sleep(1)
+                link = self.restock_queue.get()
+                if await self.prod_in_stock(link):
+                    self.log(f'[+] Got restock : {link}')
+                    prod = await self.get_prod_details(link)
+                    self.queue.put(prod)
+                    await self.db.remove_inn_rs_list(link)
+                    await asyncio.sleep(1)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
                 self.log('Blind exception in invictus restock')
@@ -210,15 +205,16 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
             if 'hidden' in classes:
                 return True
             else:
-                self.log(f'{link} is out of stock 1')
+                # self.log(f'{link} is out of stock 1')
                 return False
         except exceptions.NoSuchElementException:
             try:
                 self.driver.find_elements_by_class_name('product-slider')
+                self.log('In stock')
                 return True
             except exceptions.NoSuchElementException:
-                self.log(f'{link} is out of stock 2')
+                # self.log(f'{link} is out of stock 2')
                 return False
         except exceptions.TimeoutException:
-            self.log(f'{link} is out of stock 3')
+            # self.log(f'{link} is out of stock 3')
             return False

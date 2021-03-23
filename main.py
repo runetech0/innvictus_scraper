@@ -5,6 +5,7 @@ from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
 from scrapers.liverpool import LiverPoolNewProdsScraper
 from scrapers.alivemex import AliveMexNewProdScraper
+from extensions.restock_helper import RestockHelper
 from extensions.sender import Sender
 from Cogs.bot import start_bot
 import logging
@@ -47,8 +48,17 @@ mp.Process(target=mon.start).start()
 time.sleep(psd)
 
 # Invictus Product Restock Monoitor
-mon = InvictusRestockMonitor(products_queue)
-mp.Process(target=mon.start).start()
+
+restock_queue = mp.Queue()
+
+helper = RestockHelper(restock_queue)
+mp.Process(target=helper.start).start()
+
+
+for i in range(5):
+    mon = InvictusRestockMonitor(products_queue, restock_queue)
+    mp.Process(target=mon.start).start()
+    await time.sleep(2)
 time.sleep(psd)
 
 # Start the taf threads
