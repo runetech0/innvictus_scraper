@@ -174,8 +174,8 @@ class InvictusRestockMonitor(InvictusNewProductsScraper):
         display = Display(visible=0, size=(1920, 1080))
         display.start()
         self.log('[+] Restock monitor is ready!')
+        # self.log('[+] Invictus Restock Checking for restock')
         while True:
-            self.log('[+] Invictus Restock Checking for restock')
             try:
                 while self.restock_queue.empty():
                     await asyncio.sleep(1)
