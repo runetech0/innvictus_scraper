@@ -49,6 +49,8 @@ class TafNewProdsScraper:
                 for link in links:
                     if not self.cache.has_item(link):
                         prod_details = await self.get_prod_details(link)
+                        if prod_details is None:
+                            prod_details = await self.get_partial_prod_details(link)
                         self.queue.put(prod_details)
                         self.cache.add_item(link)
                 await asyncio.sleep(self.itter_time)
@@ -80,6 +82,34 @@ class TafNewProdsScraper:
             links.append(prod_link)
         return links
 
+    async def get_partial_prod_details(self, link):
+        await self.start_driver()
+        self.driver.get(self.URL)
+        try:
+            WebDriverWait(self.driver, 60).until(
+                EC.presence_of_all_elements_located(
+                    (By.CLASS_NAME, 'product-item'))
+            )
+        except Exception as e:
+            self.log(e)
+        prods = self.driver.find_elements_by_class_name('product-item')
+        for prod in prods:
+            prod_link = prod.find_element_by_tag_name(
+                'a').get_attribute('href')
+            if prod_link != link:
+                continue
+            p = TafProduct()
+            p.link = prod_link
+            p.img_link = prod.find_element_by_tag_name(
+                'img').get_attribute('src')
+            p.title = prod.find_element_by_class_name(
+                'product-item__name').text
+            p.price = prod.find_element_by_class_name(
+                'product-item__price').text.replace('$', '').replace(',', '')
+            p.sku = 'N/A'
+            p.model = 'N/A'
+            return p
+
     async def get_prod_details(self, link):
         await self.start_driver()
         self.driver.get(link)
@@ -90,20 +120,25 @@ class TafNewProdsScraper:
             )
         except Exception as e:
             self.log(e)
-        info_html = self.driver.find_element_by_class_name(
-            'product-detail').get_attribute('innerHTML')
-        soup = BeautifulSoup(info_html, 'html.parser')
-        p = TafProduct()
-        p.title = soup.select_one('.product-detail__name').text
-        p.link = link
-        p.price = soup.select_one(
-            '.price-best-price').text.split(':')[-1].strip()
-        p.model = soup.select_one(
-            '.product-detail__model').text.split(':')[-1].strip()
-        p.img_link = self.driver.find_element_by_class_name(
-            'product-detail__zoom-wrapper').find_element_by_tag_name('a').get_attribute('href')
-        sku_list = self.driver.find_element_by_class_name('skuList')
-        all_skus = sku_list.find_elements_by_tag_name('label')
+            print('Product is none')
+            return None
+        try:
+            info_html = self.driver.find_element_by_class_name(
+                'product-detail').get_attribute('innerHTML')
+            soup = BeautifulSoup(info_html, 'html.parser')
+            p = TafProduct()
+            p.title = soup.select_one('.product-detail__name').text
+            p.link = link
+            p.price = soup.select_one(
+                '.price-best-price').text.split(':')[-1].strip()
+            p.model = soup.select_one(
+                '.product-detail__model').text.split(':')[-1].strip()
+            p.img_link = self.driver.find_element_by_class_name(
+                'product-detail__zoom-wrapper').find_element_by_tag_name('a').get_attribute('href')
+            sku_list = self.driver.find_element_by_class_name('skuList')
+            all_skus = sku_list.find_elements_by_tag_name('label')
+        except:
+            return None
         for sku in all_skus:
             size = TafSize()
             size.size_number = sku.text

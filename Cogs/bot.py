@@ -9,7 +9,8 @@ from models.products import (
     InvictusProduct,
     TafProduct,
     LiverPoolProduct,
-    AliveMexProduct
+    AliveMexProduct,
+    JetStoreProduct
 )
 import logging
 from datetime import datetime as dt
@@ -122,6 +123,21 @@ async def create_alivemex_embed(prod: LiverPoolProduct):
     return embed
 
 
+async def create_jetstore_embed(prod: JetStoreProduct):
+    embed = discord.Embed(color=EMBEDS_COLOR)
+    embed.title = prod.name
+    embed.add_field(name='Price', value=f'${prod.price}', inline=False)
+    embed.url = prod.link
+    desc = '**Sizes**\n'
+    for size in prod.sizes:
+        desc = f'{desc}\t{size}'
+    embed.description = desc
+    embed.set_thumbnail(url=prod.img_link)
+    footer_text = f'Chefsitos MX | {get_timestamp()}'
+    embed.set_footer(text=footer_text)
+    return embed
+
+
 async def after_ready(products_queue):
     while not bot.is_ready():
         await asyncio.sleep(1)
@@ -129,6 +145,7 @@ async def after_ready(products_queue):
     taf_channel_id = config.get("TAF_CHANNEL_ID")
     liverpool_channel_id = config.get("LIVERPOOL_CHANNEL_ID")
     alivemex_channel_id = config.get("ALIVEMEX_CHANNEL_ID")
+    jetstore_channel_id = config.get("JETSTORE_CHANNEL_ID")
     innvictus_channel = discord.utils.get(
         bot.guilds[0].channels, id=innvictus_ch_id)
     taf_channel = discord.utils.get(
@@ -137,6 +154,8 @@ async def after_ready(products_queue):
         bot.guilds[0].channels, id=liverpool_channel_id)
     alivemex_channel = discord.utils.get(
         bot.guilds[0].channels, id=alivemex_channel_id)
+    jetstore_channel = discord.utils.get(
+        bot.guilds[0].channels, id=jetstore_channel_id)
     if innvictus_channel:
         log('[+] Innvictus channel found!')
     if taf_channel:
@@ -145,6 +164,8 @@ async def after_ready(products_queue):
         log('[+] Liverpool Channel found!')
     if alivemex_channel:
         log('[+] AliveMex Channel found!')
+    if jetstore_channel:
+        log('[+] JetStore Channel found!')
 
     while True:
         while products_queue.empty():
@@ -162,6 +183,9 @@ async def after_ready(products_queue):
         elif isinstance(prod, AliveMexProduct):
             embed = await create_alivemex_embed(prod)
             await alivemex_channel.send(embed=embed)
+        elif isinstance(prod, JetStoreProduct):
+            embed = await create_jetstore_embed(prod)
+            await jetstore_channel.send(embed=embed)
 
 
 def start_bot(products_queue):

@@ -55,3 +55,12 @@ class AliveMexProduct:
         self.link = None
         self.img_link = None
         self.price = None
+
+
+class JetStoreProduct:
+    def __init__(self):
+        self.name = None
+        self.link = None
+        self.img_link = None
+        self.price = None
+        self.sizes = list()

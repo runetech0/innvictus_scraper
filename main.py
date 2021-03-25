@@ -5,6 +5,7 @@ from scrapers.invictus import InvictusNewProductsScraper, InvictusRestockMonitor
 from scrapers.taf import TafNewProdsScraper, TafKeywordMonitor
 from scrapers.liverpool import LiverPoolNewProdsScraper
 from scrapers.alivemex import AliveMexNewProdScraper
+from scrapers.jetstore import JetStoreScraper
 from extensions.restock_helper import RestockHelper
 from extensions.sender import Sender
 from Cogs.bot import start_bot
@@ -27,6 +28,8 @@ fileHandler.setLevel(logging.DEBUG)
 fileHandler.setFormatter(formator)
 logger.addHandler(fileHandler)
 logger.addHandler(consoleHandler)
+
+logging.getLogger('urllib3.connectionpool').setLevel(logging.ERROR)
 
 # Kill existing chrome browser and Xvfb
 # processes running because of low system memory.
@@ -76,15 +79,25 @@ mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
-keywords = ['Nike dun', 'jordan hi', 'jordan', 'dun',  'yeezy']
+keywords = ['Nike dun', 'jordan hi', 'jordan 1', 'dun']
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
-keywords = ["lo" "mi" "hi" "du" "1" "low"]
+keywords = ["lo" "mi" "hi" "du" "low"]
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
+keywords = ["high", "retro", "yeezy"]
+mon = TafKeywordMonitor(products_queue, keywords)
+mp.Process(target=mon.start).start()
+time.sleep(psd)
 mon = AliveMexNewProdScraper(products_queue)
 mp.Process(target=mon.start).start()
+time.sleep(psd)
+
+
+mon = JetStoreScraper(products_queue)
+mp.Process(target=mon.start).start()
+time.sleep(psd)
