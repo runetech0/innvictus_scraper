@@ -1,6 +1,8 @@
 import asyncio
 from multiprocessing import Queue
 from extensions.db import DB
+import psutil
+import os
 
 
 class RestockHelper:
@@ -14,13 +16,17 @@ class RestockHelper:
 
     async def main(self):
         while True:
+            await self.uasge_control()
             if self.invictus_queue.empty():
-                print('Refilling ..')
                 restock_list = await self.db.get_inn_rs_list()
-                # restock_list = [
-                #     'https://www.innvictus.com/hombres/basket/ropa/nike/playera-jordan-x-a-ma-maniere/p/000000000000204985',
-                #     'https://www.innvictus.com/hombres/basket/tenis/jordan/tenis-air-jordan-6-retro-og-carmine-2021/p/000000000000188146'
-                # ]
                 for link in restock_list:
                     self.invictus_queue.put(link)
+            await asyncio.sleep(5)
+
+    async def uasge_control(self):
+        if int(psutil.virtual_memory()[2]) >= 80:
+            os.system('pkill chrom')
+            await asyncio.sleep(5)
+        if int(psutil.cpu_percent()) >= 80:
+            os.system('pkill chrom')
             await asyncio.sleep(5)
