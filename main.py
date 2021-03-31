@@ -58,7 +58,7 @@ helper = RestockHelper(restock_queue)
 mp.Process(target=helper.start).start()
 
 
-for i in range(10):
+for i in range(5):
     mon = InvictusRestockMonitor(products_queue, restock_queue)
     mp.Process(target=mon.start).start()
     time.sleep(2)
@@ -74,17 +74,17 @@ mon = LiverPoolNewProdsScraper(products_queue)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
-keywords = ['Nike dunk', 'jordan lo', 'jordan mi']
+keywords = ['Nike dunk', 'lo', 'mi']
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
-keywords = ['Nike dun', 'jordan hi', 'jordan 1', 'dun']
+keywords = ['jordan hi', 'jordan 1', 'dun']
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
 
-keywords = ["lo" "mi" "hi" "du" "low"]
+keywords = ["du" "low" "hi"]
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
@@ -93,6 +93,8 @@ keywords = ["high", "retro", "yeezy"]
 mon = TafKeywordMonitor(products_queue, keywords)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
+
+
 mon = AliveMexNewProdScraper(products_queue)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
