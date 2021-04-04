@@ -16,7 +16,7 @@ class RestockHelper:
 
     async def main(self):
         while True:
-            await self.uasge_control()
+            # await self.uasge_control()
             if self.invictus_queue.empty():
                 restock_list = await self.db.get_inn_rs_list()
                 for link in restock_list:
