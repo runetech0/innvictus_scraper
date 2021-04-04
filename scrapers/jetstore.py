@@ -5,11 +5,12 @@ import json
 from models.cache import ListCache
 import logging
 from models.products import JetStoreProduct
+import configs.global_vars as global_vars
 
 
 class JetStoreScraper:
     def __init__(self, queue):
-        self.config = json.load(open('config.json', 'r'))
+        self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')
