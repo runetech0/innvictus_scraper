@@ -33,8 +33,8 @@ logging.getLogger('urllib3.connectionpool').setLevel(logging.ERROR)
 
 # Kill existing chrome browser and Xvfb
 # processes running because of low system memory.
-# os.system('pkill chrom')
-# os.system('pkill Xvfb')
+os.system('pkill chrom')
+os.system('pkill Xvfb')
 psd = 10
 
 # Products queue
