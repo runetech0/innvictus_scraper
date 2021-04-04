@@ -65,8 +65,14 @@ restock_queue = mp.Queue()
 # time.sleep(psd)
 
 # Start the taf threads
-mon = TafNewProdsScraper(products_queue)
-mp.Process(target=mon.start).start()
+links = [
+    'https://www.taf.com.mx/dunk',
+    'https://www.taf.com.mx/jordan'
+]
+for link in links:
+    mon = TafNewProdsScraper(products_queue, link)
+    mp.Process(target=mon.start).start()
+    time.sleep(3)
 time.sleep(psd)
 
 

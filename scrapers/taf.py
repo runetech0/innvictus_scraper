@@ -13,7 +13,7 @@ from models.cache import ListCache
 
 
 class TafNewProdsScraper:
-    def __init__(self, queue):
+    def __init__(self, queue, target_link):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
         self.options = webdriver.ChromeOptions()
@@ -24,7 +24,7 @@ class TafNewProdsScraper:
         self.options.add_argument('disable-infobars')
         self.webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.driver = None
-        self.URL = 'https://www.taf.com.mx/jordan'
+        self.URL = target_link
         self.log = logging.getLogger(' TafNewProducts ').info
         self.itter_time = 10
 
@@ -160,7 +160,7 @@ class TafNewProdsScraper:
 
 class TafKeywordMonitor(TafNewProdsScraper):
     def __init__(self, queue, keywords):
-        super().__init__(queue)
+        super().__init__(queue, target_link='')
         self.keywords = keywords
         self.base_URL = f'https://www.taf.com.mx'
         self.log = logging.getLogger(' TafKeywordMon ').info
