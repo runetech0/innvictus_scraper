@@ -46,9 +46,9 @@ time.sleep(psd)
 # All the processes are connected through queues
 
 # Thread to scrape invictus new products and send to the sender thread
-mon = InvictusNewProductsScraper(products_queue)
-mp.Process(target=mon.start).start()
-time.sleep(psd)
+# mon = InvictusNewProductsScraper(products_queue)
+# mp.Process(target=mon.start).start()
+# time.sleep(psd)
 
 # Invictus Product Restock Monoitor
 
