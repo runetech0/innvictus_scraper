@@ -33,19 +33,15 @@ class TafNewProdsScraper:
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.main())
 
-    async def start_driver(self):
-        self.quit_browser()
+    async def main(self):
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
-
-    async def main(self):
         self.log('[+] Taf New Prods Scraper is up!')
         await self.create_cache()
         while True:
             try:
                 links = await self.get_all_prods_links()
-                self.log(f'[+] Got {len(links)} prod links')
                 for link in links:
                     if not self.cache.has_item(link):
                         prod_details = await self.get_prod_details(link)
@@ -65,7 +61,7 @@ class TafNewProdsScraper:
         self.log('[+] Created cache for prods')
 
     async def get_all_prods_links(self):
-        await self.start_driver()
+        # await self.start_driver()
         self.driver.get(self.URL)
         try:
             WebDriverWait(self.driver, 60).until(
@@ -83,7 +79,7 @@ class TafNewProdsScraper:
         return links
 
     async def get_partial_prod_details(self, link):
-        await self.start_driver()
+        # await self.start_driver()
         self.driver.get(self.URL)
         try:
             WebDriverWait(self.driver, 60).until(
@@ -111,7 +107,7 @@ class TafNewProdsScraper:
             return p
 
     async def get_prod_details(self, link):
-        await self.start_driver()
+        # await self.start_driver()
         self.driver.get(link)
         try:
             WebDriverWait(self.driver, 60).until(
@@ -120,7 +116,6 @@ class TafNewProdsScraper:
             )
         except Exception as e:
             self.log(e)
-            print('Product is none')
             return None
         try:
             info_html = self.driver.find_element_by_class_name(
@@ -152,10 +147,10 @@ class TafNewProdsScraper:
             p.in_stock_sizes.append(size)
         return p
 
-    def quit_browser(self):
-        if self.driver is not None:
-            self.driver.quit()
-            self.driver = None
+    # def quit_browser(self):
+    #     if self.driver is not None:
+    #         self.driver.quit()
+    #         self.driver = None
 
 
 class TafKeywordMonitor(TafNewProdsScraper):
@@ -167,6 +162,9 @@ class TafKeywordMonitor(TafNewProdsScraper):
         self.itter_time = 10
 
     async def main(self):
+        self.driver = webdriver.Chrome(
+            executable_path=self.webdriver_path, options=self.options)
+        self.driver.implicitly_wait(10)
         self.cache = ListCache(f'TafKeyWordsMonitor')
         self.log(f'[+] Started Taf keyword monitor')
         await self.create_cache()
@@ -179,7 +177,6 @@ class TafKeywordMonitor(TafNewProdsScraper):
                         continue
                     self.URL = target_link
                     prod_links = await self.get_all_prods_links()
-                    self.log(f'[+] Got {len(prod_links)} prod links')
                     for link in prod_links:
                         if not self.cache.has_item(link):
                             prod_details = await self.get_prod_details(link)
@@ -191,8 +188,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
                 await asyncio.sleep(3)
 
     async def create_cache(self):
-        self.log('[+] Creating cache...')
-        await self.start_driver()
+        # await self.start_driver()
         for keyword in self.keywords:
             target_link = f'{self.base_URL}/{keyword}'
             if not await self.has_prods(target_link):
@@ -201,10 +197,9 @@ class TafKeywordMonitor(TafNewProdsScraper):
             prod_links = await self.get_all_prods_links()
             for link in prod_links:
                 self.cache.add_item(link)
-        self.log('[+] Cache created!')
 
     async def has_prods(self, link):
-        await self.start_driver()
+        # await self.start_driver()
         self.driver.get(link)
         try:
             self.driver.find_element_by_class_name('head-tittle')

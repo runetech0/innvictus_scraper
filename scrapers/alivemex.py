@@ -31,13 +31,10 @@ class AliveMexNewProdScraper:
         self.cache = ListCache('AliveMexNewProdScraper')
         self.loop.run_until_complete(self.main())
 
-    async def start_driver(self):
-        self.quit_browser()
+    async def main(self):
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
-
-    async def main(self):
         self.log('[+] AliveMex Scraper is up!')
         await self.create_cache()
         while True:
@@ -63,7 +60,7 @@ class AliveMexNewProdScraper:
 
     async def get_all_prod_links(self):
         self.log('[+] Getting all the prod links ...')
-        await self.start_driver()
+        # await self.start_driver()
         self.driver.get(self.URL)
         target_class = 'product-miniature'
         try:
@@ -84,7 +81,7 @@ class AliveMexNewProdScraper:
         return prod_links
 
     async def get_prod_details(self, link):
-        await self.start_driver()
+        # await self.start_driver()
         self.driver.get(link)
         details = AliveMexProduct()
         details.link = link
@@ -97,7 +94,7 @@ class AliveMexNewProdScraper:
 
         return details
 
-    def quit_browser(self):
-        if self.driver is not None:
-            self.driver.quit()
-            self.driver = None
+    # def quit_browser(self):
+    #     if self.driver is not None:
+    #         self.driver.quit()
+    #         self.driver = None

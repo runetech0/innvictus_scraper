@@ -17,7 +17,7 @@ class JetStoreScraper:
         self.options.add_argument('--disable-dev-shm-usage')
         self.options.add_argument('start-maximized')
         self.options.add_argument('disable-infobars')
-        # self.options.add_argument('--headless')
+        self.options.add_argument('--headless')
         webdriver_path = self.config.get("WEBDRIVER_PATH")
         self.driver = webdriver.Chrome(
             executable_path=webdriver_path, options=self.options)
@@ -34,6 +34,7 @@ class JetStoreScraper:
         await self.create_cache()
         while True:
             links = await self.get_all_prod_link()
+            print(f'Got {len(links)} links')
             for link in links:
                 if self.cache.has_item(link):
                     continue
@@ -42,10 +43,8 @@ class JetStoreScraper:
             await asyncio.sleep(self.itter_time)
 
     async def create_cache(self):
-        self.log('[+] Creating cache for jetstore')
         links = await self.get_all_prod_link()
         self.cache.replace_cache(links)
-        self.log('[+] Cache Created for jetstore')
 
     async def get_all_prod_link(self):
         self.driver.get(self.target_url)
