@@ -18,7 +18,7 @@ class TafNewProdsScraper:
         self.queue = queue
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')
-        self.options.add_argument('--headless')
+        # self.options.add_argument('--headless')
         self.options.add_argument('--disable-dev-shm-usage')
         self.options.add_argument('start-maximized')
         self.options.add_argument('disable-infobars')
@@ -68,8 +68,8 @@ class TafNewProdsScraper:
                 EC.presence_of_all_elements_located(
                     (By.CLASS_NAME, 'product-item'))
             )
-        except Exception as e:
-            self.log(e)
+        except Exception:
+            return []
         prods = self.driver.find_elements_by_class_name('product-item')
         links = []
         for prod in prods:
@@ -88,6 +88,7 @@ class TafNewProdsScraper:
             )
         except Exception as e:
             self.log(e)
+            return None
         prods = self.driver.find_elements_by_class_name('product-item')
         for prod in prods:
             prod_link = prod.find_element_by_tag_name(
@@ -177,6 +178,7 @@ class TafKeywordMonitor(TafNewProdsScraper):
                         continue
                     self.URL = target_link
                     prod_links = await self.get_all_prods_links()
+                    self.log(f'Got {len(prod_links)} prod links')
                     for link in prod_links:
                         if not self.cache.has_item(link):
                             prod_details = await self.get_prod_details(link)
