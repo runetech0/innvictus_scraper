@@ -57,8 +57,6 @@ class LiverPoolNewProdsScraper:
         self.log('[+] Created cache for prods')
 
     async def get_all_prod_links(self):
-        self.log('[+] Getting all the prod links ...')
-        # await self.start_driver()
         links = []
         for url in self.URLs:
             self.driver.get(url)
@@ -70,7 +68,6 @@ class LiverPoolNewProdsScraper:
         return links
 
     async def get_prod_details(self, link):
-        # await self.start_driver()
         self.driver.get(link)
         prod = LiverPoolProduct()
         prod.name = self.driver.find_element_by_xpath(

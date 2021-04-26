@@ -101,6 +101,12 @@ mp.Process(target=mon.start).start()
 time.sleep(psd)
 
 
+keywords = ["jordan mid", "mid", "w dunk"]
+mon = TafKeywordMonitor(products_queue, keywords)
+mp.Process(target=mon.start).start()
+time.sleep(psd)
+
+
 mon = AliveMexNewProdScraper(products_queue)
 mp.Process(target=mon.start).start()
 time.sleep(psd)
