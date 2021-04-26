@@ -32,9 +32,6 @@ class LiverPoolNewProdsScraper:
         self.cache = ListCache('LiverPoolCache')
         self.loop.run_until_complete(self.main())
 
-    # async def start_driver(self):
-    #     self.quit_browser()
-
     async def main(self):
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
@@ -70,7 +67,6 @@ class LiverPoolNewProdsScraper:
             for prod in prods_list:
                 link = prod.find_element_by_tag_name('a').get_attribute('href')
                 links.append(link)
-        self.driver.quit()
         return links
 
     async def get_prod_details(self, link):
@@ -94,7 +90,6 @@ class LiverPoolNewProdsScraper:
             '//p[@class="a-product__paragraphColor m-0 mt-2 mb-1"]').text.split(':')[-1].strip()
         prod.price = self.driver.find_element_by_xpath(
             '//p[@class="a-product__paragraphDiscountPrice m-0 d-inline "]').text.split('\n')[0].replace(',', '').replace('$', '')
-        self.driver.quit()
         return prod
 
     # def quit_browser(self):
