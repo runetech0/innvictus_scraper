@@ -39,6 +39,7 @@ class JetStoreScraper:
                 if self.cache.has_item(link):
                     continue
                 prod = await self.get_prod_details(link)
+                self.cache.add_item(link)
                 self.queue.put(prod)
             await asyncio.sleep(self.itter_time)
 

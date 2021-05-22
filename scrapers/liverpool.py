@@ -11,10 +11,10 @@ class LiverPoolNewProdsScraper:
     def __init__(self, queue):
         self.config = json.load(open(global_vars.MAIN_CONFIG_FILE_LOCATION))
         self.queue = queue
-        self.log = logging.getLogger(' LiverpoolMonitor ').info
+        print = logging.getLogger(' LiverpoolMonitor ').info
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')
-        self.options.add_argument('--headless')
+        # self.options.add_argument('--headless')
         self.options.add_argument('--disable-dev-shm-usage')
         self.options.add_argument('start-maximized')
         self.options.add_argument('disable-infobars')
@@ -36,11 +36,11 @@ class LiverPoolNewProdsScraper:
         self.driver = webdriver.Chrome(
             executable_path=self.webdriver_path, options=self.options)
         self.driver.implicitly_wait(10)
-        await self.create_cache()
+        # await self.create_cache()
         while True:
             try:
                 all_links = await self.get_all_prod_links()
-                self.log(f'[+] Got {len(all_links)} prod links!')
+                print(f'[+] Got {len(all_links)} prod links!')
                 for link in all_links:
                     if not self.cache.has_item(link):
                         prod = await self.get_prod_details(link)
@@ -48,13 +48,13 @@ class LiverPoolNewProdsScraper:
                         self.cache.add_item(link)
                 await asyncio.sleep(self.itter_time)
             except Exception as e:
-                self.log(e)
+                print(e)
 
     async def create_cache(self):
-        self.log('[+] Creating cache ..')
+        print('[+] Creating cache ..')
         links = await self.get_all_prod_links()
         self.cache.replace_cache(links)
-        self.log('[+] Created cache for prods')
+        print('[+] Created cache for prods')
 
     async def get_all_prod_links(self):
         links = []
