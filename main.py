@@ -46,9 +46,9 @@ time.sleep(psd)
 # All the processes are connected through queues
 
 # Thread to scrape invictus new products and send to the sender thread
-# mon = InvictusNewProductsScraper(products_queue)
-# mp.Process(target=mon.start).start()
-# time.sleep(psd)
+mon = InvictusNewProductsScraper(products_queue)
+mp.Process(target=mon.start).start()
+time.sleep(psd)
 
 # Invictus Product Restock Monoitor
 
@@ -58,11 +58,11 @@ restock_queue = mp.Queue()
 # mp.Process(target=helper.start).start()
 
 
-# for i in range(5):
-#     mon = InvictusRestockMonitor(products_queue, restock_queue)
-#     mp.Process(target=mon.start).start()
-#     time.sleep(2)
-# time.sleep(psd)
+for i in range(5):
+    mon = InvictusRestockMonitor(products_queue, restock_queue)
+    mp.Process(target=mon.start).start()
+    time.sleep(2)
+time.sleep(psd)
 
 # Start the taf threads
 links = [

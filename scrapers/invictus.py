@@ -1,4 +1,4 @@
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common import exceptions
 from selenium.webdriver.support.ui import WebDriverWait
@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import asyncio
 import json
 from models.products import InvictusProduct
-from scrapers.custom_driver import get_chromedriver
+from scrapers.custom_driver import get_chromedriver, get_proxy
 from pyvirtualdisplay import Display
 from extensions.db import DB
 from bs4 import BeautifulSoup
@@ -103,10 +103,17 @@ class InvictusNewProductsScraper:
         return to_return
 
     async def load_prod_page(self, link):
+        ip, port, username, password = get_proxy()
+        options = {
+            'proxy': {
+                'http': f'http://{username}:{password}@{ip}:{port}',
+                'https': f'https://{username}:{password}@{ip}:{port}',
+                'no_proxy': 'localhost,127.0.0.1,dev_server:8080'
+            }
+        }
         self.quit_browser()
-        self.driver = get_chromedriver(
-            chrome_options=self.options, use_proxy=True,
-            executable_path=self.webdriver_path)
+        self.driver = webdriver(
+            chrome_options=self.options, seleniumwire_options=options, executable_path=self.webdriver_path)
         self.driver.implicitly_wait(10)
         self.driver.get(link)
 
