@@ -7,3 +7,4 @@ __pyca*
 logs/*
 Cache/*
 db
+chromedriver
