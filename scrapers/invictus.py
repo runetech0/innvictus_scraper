@@ -112,7 +112,7 @@ class InvictusNewProductsScraper:
             }
         }
         self.quit_browser()
-        self.driver = webdriver(
+        self.driver = webdriver.Chrome(
             chrome_options=self.options, seleniumwire_options=options, executable_path=self.webdriver_path)
         self.driver.implicitly_wait(10)
         self.driver.get(link)
